@@ -8,7 +8,7 @@ Linux:GCC
 Mac OS:Xcode 3.2x
 
 
-対応言語
+-対応言語
 C++:Windows/Linux/Mac OS
 C#:Windows
 
@@ -24,3 +24,7 @@ http://d.hatena.ne.jp/kaorun55/20110518/1305722932
 -連絡先：
 kaorun55@gmail.com
 http://twitter.com/kaorun55
+
+
+-不備など
+もし、コードなどに不備があった場合、可能であれば、githubのチケットに書いてもらえると助かります。難しければ、連絡先までご連絡ください。なお、Twitetrの方が反応が速いです
