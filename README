@@ -1,0 +1,26 @@
+書籍「KINECTセンサープログラミング」中のサンプルコードです
+http://www.shuwasystem.co.jp/products/7980html/2981.html
+
+
+-対応OS
+Windows:Visual C++/C# 2010 Express
+Linux:GCC
+Mac OS:Xcode 3.2x
+
+
+対応言語
+C++:Windows/Linux/Mac OS
+C#:Windows
+
+
+-Windows環境のC++で、ビルドエラーが発生する場合の対処法
+http://d.hatena.ne.jp/kaorun55/20110523/1306140845
+
+
+-本の詳細：
+http://d.hatena.ne.jp/kaorun55/20110518/1305722932
+
+
+-連絡先：
+kaorun55@gmail.com
+http://twitter.com/kaorun55
