@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NiteBuild", "NiteBuild\NiteBuild.csproj", "{FE0B568F-1BB2-454E-A1E6-B5C5797FCC10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionManager", "SessionManager\SessionManager.csproj", "{CF79477E-638C-4117-9067-D511B666B9EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaveDetector", "WaveDetector\WaveDetector.csproj", "{4EBBE050-9A44-4EB0-980A-5A04F9DB803F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PushDetector", "PushDetector\PushDetector.csproj", "{CF9C5B3B-5DDC-40A2-A652-5A851058DC6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwipeDetector", "SwipeDetector\SwipeDetector.csproj", "{D36AD93E-70C2-422C-87EC-C6EF96B6D80C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteadyDetector", "SteadyDetector\SteadyDetector.csproj", "{6C809061-8C0F-4F26-BEED-E3E8BE1A3EA1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE0B568F-1BB2-454E-A1E6-B5C5797FCC10}.Debug|x86.ActiveCfg = Debug|x86
+		{FE0B568F-1BB2-454E-A1E6-B5C5797FCC10}.Debug|x86.Build.0 = Debug|x86
+		{FE0B568F-1BB2-454E-A1E6-B5C5797FCC10}.Release|x86.ActiveCfg = Release|x86
+		{FE0B568F-1BB2-454E-A1E6-B5C5797FCC10}.Release|x86.Build.0 = Release|x86
+		{CF79477E-638C-4117-9067-D511B666B9EB}.Debug|x86.ActiveCfg = Debug|x86
+		{CF79477E-638C-4117-9067-D511B666B9EB}.Debug|x86.Build.0 = Debug|x86
+		{CF79477E-638C-4117-9067-D511B666B9EB}.Release|x86.ActiveCfg = Release|x86
+		{CF79477E-638C-4117-9067-D511B666B9EB}.Release|x86.Build.0 = Release|x86
+		{4EBBE050-9A44-4EB0-980A-5A04F9DB803F}.Debug|x86.ActiveCfg = Debug|x86
+		{4EBBE050-9A44-4EB0-980A-5A04F9DB803F}.Debug|x86.Build.0 = Debug|x86
+		{4EBBE050-9A44-4EB0-980A-5A04F9DB803F}.Release|x86.ActiveCfg = Release|x86
+		{4EBBE050-9A44-4EB0-980A-5A04F9DB803F}.Release|x86.Build.0 = Release|x86
+		{CF9C5B3B-5DDC-40A2-A652-5A851058DC6A}.Debug|x86.ActiveCfg = Debug|x86
+		{CF9C5B3B-5DDC-40A2-A652-5A851058DC6A}.Debug|x86.Build.0 = Debug|x86
+		{CF9C5B3B-5DDC-40A2-A652-5A851058DC6A}.Release|x86.ActiveCfg = Release|x86
+		{CF9C5B3B-5DDC-40A2-A652-5A851058DC6A}.Release|x86.Build.0 = Release|x86
+		{D36AD93E-70C2-422C-87EC-C6EF96B6D80C}.Debug|x86.ActiveCfg = Debug|x86
+		{D36AD93E-70C2-422C-87EC-C6EF96B6D80C}.Debug|x86.Build.0 = Debug|x86
+		{D36AD93E-70C2-422C-87EC-C6EF96B6D80C}.Release|x86.ActiveCfg = Release|x86
+		{D36AD93E-70C2-422C-87EC-C6EF96B6D80C}.Release|x86.Build.0 = Release|x86
+		{6C809061-8C0F-4F26-BEED-E3E8BE1A3EA1}.Debug|x86.ActiveCfg = Debug|x86
+		{6C809061-8C0F-4F26-BEED-E3E8BE1A3EA1}.Debug|x86.Build.0 = Debug|x86
+		{6C809061-8C0F-4F26-BEED-E3E8BE1A3EA1}.Release|x86.ActiveCfg = Release|x86
+		{6C809061-8C0F-4F26-BEED-E3E8BE1A3EA1}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

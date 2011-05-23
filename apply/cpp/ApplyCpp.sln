@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpticalCamouflage", "OpticalCamouflage\OpticalCamouflage.vcxproj", "{A24F6FA6-F6A8-4AA1-AB9B-95A14E89C32B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DrawUser", "DrawUser\DrawUser.vcxproj", "{12877CB8-CD9A-4EC6-9DC2-3E2273F75A72}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FaceDetect", "FaceDetect\FaceDetect.vcxproj", "{639D0794-F0FD-4EFA-97C3-CFF617ADAD84}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PoseDetect", "PoseDetect\PoseDetect.vcxproj", "{7A96C4AE-4F41-40D2-BC6A-F2847FEBC3A8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MultipleKinect", "MultipleKinect\MultipleKinect.vcxproj", "{71240AB6-FC96-4CBC-A9BE-295EC7ED478B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A24F6FA6-F6A8-4AA1-AB9B-95A14E89C32B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A24F6FA6-F6A8-4AA1-AB9B-95A14E89C32B}.Debug|Win32.Build.0 = Debug|Win32
+		{A24F6FA6-F6A8-4AA1-AB9B-95A14E89C32B}.Release|Win32.ActiveCfg = Release|Win32
+		{A24F6FA6-F6A8-4AA1-AB9B-95A14E89C32B}.Release|Win32.Build.0 = Release|Win32
+		{12877CB8-CD9A-4EC6-9DC2-3E2273F75A72}.Debug|Win32.ActiveCfg = Debug|Win32
+		{12877CB8-CD9A-4EC6-9DC2-3E2273F75A72}.Debug|Win32.Build.0 = Debug|Win32
+		{12877CB8-CD9A-4EC6-9DC2-3E2273F75A72}.Release|Win32.ActiveCfg = Release|Win32
+		{12877CB8-CD9A-4EC6-9DC2-3E2273F75A72}.Release|Win32.Build.0 = Release|Win32
+		{639D0794-F0FD-4EFA-97C3-CFF617ADAD84}.Debug|Win32.ActiveCfg = Debug|Win32
+		{639D0794-F0FD-4EFA-97C3-CFF617ADAD84}.Debug|Win32.Build.0 = Debug|Win32
+		{639D0794-F0FD-4EFA-97C3-CFF617ADAD84}.Release|Win32.ActiveCfg = Release|Win32
+		{639D0794-F0FD-4EFA-97C3-CFF617ADAD84}.Release|Win32.Build.0 = Release|Win32
+		{7A96C4AE-4F41-40D2-BC6A-F2847FEBC3A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7A96C4AE-4F41-40D2-BC6A-F2847FEBC3A8}.Debug|Win32.Build.0 = Debug|Win32
+		{7A96C4AE-4F41-40D2-BC6A-F2847FEBC3A8}.Release|Win32.ActiveCfg = Release|Win32
+		{7A96C4AE-4F41-40D2-BC6A-F2847FEBC3A8}.Release|Win32.Build.0 = Release|Win32
+		{71240AB6-FC96-4CBC-A9BE-295EC7ED478B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{71240AB6-FC96-4CBC-A9BE-295EC7ED478B}.Debug|Win32.Build.0 = Debug|Win32
+		{71240AB6-FC96-4CBC-A9BE-295EC7ED478B}.Release|Win32.ActiveCfg = Release|Win32
+		{71240AB6-FC96-4CBC-A9BE-295EC7ED478B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
