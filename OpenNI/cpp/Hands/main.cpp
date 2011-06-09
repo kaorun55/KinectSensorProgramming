@@ -165,7 +165,6 @@ int main (int argc, char * argv[])
       image.GetMetaData(imageMD);
 
       // カメラ画像の表示
-      //  Kinectからの入力がBGRであるため、RGBに変換して表示する
       memcpy(camera->imageData, imageMD.RGB24Data(), camera->imageSize);
 
       // 座標を描画
@@ -192,7 +191,8 @@ int main (int argc, char * argv[])
           }
       }
 
-      ::cvCvtColor(camera, camera, CV_BGR2RGB);
+      //  Kinectからの入力がRGBであるため、BGRに変換して表示する
+      ::cvCvtColor(camera, camera, CV_RGB2BGR);
       ::cvShowImage("KinectImage", camera);
 
       // 終了する

@@ -108,9 +108,9 @@ int main (int argc, char * argv[])
             image.GetMetaData(imageMD);
             
             // カメラ画像の表示
-            //  Kinectからの入力がBGRであるため、RGBに変換して表示する
+            //  Kinectからの入力がRGBであるため、BGRに変換して表示する
             memcpy(camera->imageData, imageMD.RGB24Data(), camera->imageSize);
-            ::cvCvtColor(camera, camera, CV_BGR2RGB);
+            ::cvCvtColor(camera, camera, CV_RGB2BGR);
             ::cvShowImage("KinectImage", camera);
 
             // キーイベント
