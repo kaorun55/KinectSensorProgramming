@@ -37,7 +37,7 @@ namespace Player
       }
 
       // 終端に達したら通知するコールバックを登録する
-      player.EndOfFileReached += new StateChangedHandler(player_EndOfFileReached);
+      player.EndOfFileReached += new EventHandler(player_EndOfFileReached);
 
       // イメージジェネレータの作成
       image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
@@ -53,6 +53,11 @@ namespace Player
       
       // ヒストグラムバッファの作成
       histogram = new int[depth.DeviceMaxDepth];
+    }
+
+    void player_EndOfFileReached(object sender, EventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // 描画

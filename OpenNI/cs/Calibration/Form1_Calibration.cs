@@ -75,8 +75,8 @@ namespace Calibration
       }
 
       // ユーザー認識のコールバックを登録
-      user.NewUser += new UserGenerator.NewUserHandler(user_NewUser);
-      user.LostUser += new UserGenerator.LostUserHandler(user_LostUser);
+      user.NewUser += new EventHandler<NewUserEventArgs>(user_NewUser);
+      user.LostUser += new EventHandler<UserLostEventArgs>(user_LostUser);
 
       //キャリブレーションにポーズが必要か確認
       skelton = user.SkeletonCapability;
@@ -91,21 +91,13 @@ namespace Calibration
 
         // ポーズ検出のコールバックを登録
         PoseDetectionCapability poseDetect = user.PoseDetectionCapability;
-        poseDetect.PoseDetected +=
-            new PoseDetectionCapability.PoseDetectedHandler(
-                                          poseDetect_PoseDetected);
-        poseDetect.PoseEnded +=
-            new PoseDetectionCapability.PoseEndedHandler(
-                                          poseDetect_PoseEnded);
+        poseDetect.PoseDetected += new EventHandler<PoseDetectedEventArgs>(poseDetect_PoseDetected);
+        poseDetect.PoseEnded += new EventHandler<PoseEndedEventArgs>(poseDetect_PoseEnded);
       }
 
       // キャリブレーションのコールバックを登録
-      skelton.CalibrationStart +=
-            new SkeletonCapability.CalibrationStartHandler(
-                                        skelton_CalibrationStart);
-      skelton.CalibrationEnd +=
-            new SkeletonCapability.CalibrationEndHandler(
-                                        skelton_CalibrationEnd);
+      skelton.CalibrationStart += new EventHandler<CalibrationStartEventArgs>(skelton_CalibrationStart);
+      skelton.CalibrationEnd += new EventHandler<CalibrationEndEventArgs>(skelton_CalibrationEnd);
 
       // すべてをトラッキングする
       skelton.SetSkeletonProfile(SkeletonProfile.All);
@@ -186,6 +178,7 @@ namespace Calibration
     }
 
 
+
     // ユーザー検出
     void user_NewUser(ProductionNode node, int id)
     {
@@ -201,10 +194,20 @@ namespace Calibration
       }
     }
 
+    void user_NewUser(object sender, NewUserEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
     // ユーザー消失
     void user_LostUser(ProductionNode node, uint id)
     {
       message = "ユーザー消失:" + id;
+    }
+
+    void user_LostUser(object sender, UserLostEventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // ポーズ検出
@@ -217,16 +220,31 @@ namespace Calibration
       user.SkeletonCapability.RequestCalibration(id, true);
     }
 
+    void poseDetect_PoseDetected(object sender, PoseDetectedEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
     // ポーズ検出終了
     void poseDetect_PoseEnded(ProductionNode node, string pose, uint id)
     {
       message = "ポーズ消失:" + pose + " ユーザー:" + id;
     }
 
+    void poseDetect_PoseEnded(object sender, PoseEndedEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
     // キャリブレーション開始
     void skelton_CalibrationStart(ProductionNode node, uint id)
     {
       message = "キャリブレーション開始:" + id;
+    }
+
+    void skelton_CalibrationStart(object sender, CalibrationStartEventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // キャリブレーション終了
@@ -241,6 +259,11 @@ namespace Calibration
       else {
         message = "キャリブレーション失敗:" + id;
       }
+    }
+
+    void skelton_CalibrationEnd(object sender, CalibrationEndEventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // 骨格の線を引く

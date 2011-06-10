@@ -53,8 +53,7 @@ namespace MirrorCapability
       //   ミラー状態が変更されたことを通知するコールバックを登録
       //   ミラー状態の取得
       OpenNI.MirrorCapability imageMirror = image.MirrorCapability;
-      imageMirror.MirrorChangedEvent += new StateChangedHandler(
-                                                    Form1_MirrorChangedEvent);
+      imageMirror.MirrorChangedEvent += new EventHandler(imageMirror_MirrorChangedEvent);
       mirrorState.Add(image.ToString(), imageMirror.IsMirrored());
 
 
@@ -62,12 +61,21 @@ namespace MirrorCapability
       //   ミラー状態が変更されたことを通知するコールバックを登録
       //   ミラー状態の取得
       OpenNI.MirrorCapability depthMirror = depth.MirrorCapability;
-      depthMirror.MirrorChangedEvent += new StateChangedHandler(
-                                                    Form1_MirrorChangedEvent);
+      depthMirror.MirrorChangedEvent += new EventHandler(depthMirror_MirrorChangedEvent);
       mirrorState.Add(depth.ToString(), depthMirror.IsMirrored());
 
       // ヒストグラムバッファの作成
       histogram = new int[depth.DeviceMaxDepth];
+    }
+
+    void imageMirror_MirrorChangedEvent(object sender, EventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void depthMirror_MirrorChangedEvent(object sender, EventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // ミラー状態が変化したときに通知する

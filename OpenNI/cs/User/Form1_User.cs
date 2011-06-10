@@ -70,8 +70,18 @@ namespace User
       }
 
       // ユーザー認識のコールバックを登録
-      user.NewUser += new UserGenerator.NewUserHandler(user_NewUser);
-      user.LostUser += new UserGenerator.LostUserHandler(user_LostUser);
+      user.NewUser += new EventHandler<NewUserEventArgs>(user_NewUser);
+      user.LostUser += new EventHandler<UserLostEventArgs>(user_LostUser);
+    }
+
+    void user_LostUser(object sender, UserLostEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void user_NewUser(object sender, NewUserEventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // 新しユーザーの検出

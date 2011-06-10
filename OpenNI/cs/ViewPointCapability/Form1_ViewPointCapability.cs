@@ -45,8 +45,7 @@ namespace ViewpointCapability
       // ビューポイントが変更されたことを通知するコールバックを登録する
       AlternativeViewpointCapability Viewpoint =
                             depth.AlternativeViewpointCapability;
-      Viewpoint.ViewpointChanged += new StateChangedHandler(
-                                          Viewpoint_ViewpointChanged);
+      Viewpoint.ViewpointChanged += new EventHandler(Viewpoint_ViewpointChanged);
 
       // ビューポイントのサポート状態を確認する
       if (!Viewpoint.IsViewpointSupported(image)) {
@@ -58,6 +57,11 @@ namespace ViewpointCapability
 
       // ヒストグラムバッファの作成
       histogram = new int[depth.DeviceMaxDepth];
+    }
+
+    void Viewpoint_ViewpointChanged(object sender, EventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // ビューポイントが変化したことを通知する

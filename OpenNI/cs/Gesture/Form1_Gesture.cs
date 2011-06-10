@@ -78,15 +78,27 @@ namespace Gesture
       }
 
       // ジェスチャー用のコールバックを登録
-      gesture.GestureRecognized += new GestureGenerator.GestureRecognizedHandler(
-                                                        gesture_GestureRecognized);
-      gesture.GestureProgress += new GestureGenerator.GestureProgressHandler(
-                                                        gesture_GestureProgress);
-      gesture.GestureChanged += new StateChangedHandler(
-                                                        gesture_GestureChanged);
+      gesture.GestureRecognized += new EventHandler<GestureRecognizedEventArgs>(gesture_GestureRecognized);
+      gesture.GestureProgress += new EventHandler<GestureProgressEventArgs>(gesture_GestureProgress);
+      gesture.GestureChanged += new EventHandler(gesture_GestureChanged);
 
       // ジェスチャーの検出開始
       context.StartGeneratingAll();
+    }
+
+    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void gesture_GestureChanged(object sender, EventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // 描画

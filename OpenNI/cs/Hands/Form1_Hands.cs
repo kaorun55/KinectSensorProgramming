@@ -83,10 +83,8 @@ namespace Hands
       gesture.AddGesture("RaiseHand");
 
       // ジェスチャー用のコールバックを登録
-      gesture.GestureRecognized += new GestureGenerator.GestureRecognizedHandler(
-                                                        gesture_GestureRecognized);
-      gesture.GestureProgress += new GestureGenerator.GestureProgressHandler(
-                                                        gesture_GestureProgress);
+      gesture.GestureRecognized += new EventHandler<GestureRecognizedEventArgs>(gesture_GestureRecognized);
+      gesture.GestureProgress += new EventHandler<GestureProgressEventArgs>(gesture_GestureProgress);
 
       // ハンドジェネレータの作成
       hands = context.FindExistingNode(NodeType.Hands) as HandsGenerator;
@@ -95,13 +93,37 @@ namespace Hands
       }
 
       // ハンドトラッキング用のコールバックを登録する
-      hands.HandCreate += new HandsGenerator.HandCreateHandler(hands_HandCreate);
-      hands.HandUpdate += new HandsGenerator.HandUpdateHandler(hands_HandUpdate);
-      hands.HandDestroy += new HandsGenerator.HandDestroyHandler(
-                                                                hands_HandDestroy);
+      hands.HandCreate += new EventHandler<HandCreateEventArgs>(hands_HandCreate);
+      hands.HandUpdate += new EventHandler<HandUpdateEventArgs>(hands_HandUpdate);
+      hands.HandDestroy += new EventHandler<HandDestroyEventArgs>(hands_HandDestroy);
 
       // ジェスチャーの検出開始
       context.StartGeneratingAll();
+    }
+
+    void hands_HandDestroy(object sender, HandDestroyEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void hands_HandUpdate(object sender, HandUpdateEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void hands_HandCreate(object sender, HandCreateEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
+    {
+      throw new NotImplementedException();
+    }
+
+    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
+    {
+      throw new NotImplementedException();
     }
 
     // 描画
