@@ -55,11 +55,6 @@ namespace Player
       histogram = new int[depth.DeviceMaxDepth];
     }
 
-    void player_EndOfFileReached(object sender, EventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
     // 描画
     private unsafe void xnDraw()
     {
@@ -129,7 +124,7 @@ namespace Player
     }
 
     // 記録の終了を通知する
-    void player_EndOfFileReached(ProductionNode node)
+    void player_EndOfFileReached(object sender, EventArgs e)
     {
     }
 
