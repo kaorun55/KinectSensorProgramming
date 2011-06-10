@@ -180,90 +180,62 @@ namespace Calibration
 
 
     // ユーザー検出
-    void user_NewUser(ProductionNode node, int id)
-    {
-      message = "ユーザー検出:" + id;
-
-      // ポーズの検出が必要であれば、ポーズの検出を開始する
-      if (!string.IsNullOrEmpty(pose)) {
-        user.PoseDetectionCapability.StartPoseDetection(pose, id);
-      }
-      // ポーズの検出が不要であれば、キャリブレーションを開始する
-      else {
-        user.SkeletonCapability.RequestCalibration(id, true);
-      }
-    }
-
     void user_NewUser(object sender, NewUserEventArgs e)
     {
-      throw new NotImplementedException();
+      message = "ユーザー検出:" + e.ID;
+
+      // ポーズの検出が必要であれば、ポーズの検出を開始する
+      if (!string.IsNullOrEmpty(pose))
+      {
+        user.PoseDetectionCapability.StartPoseDetection(pose, e.ID);
+      }
+      // ポーズの検出が不要であれば、キャリブレーションを開始する
+      else
+      {
+        user.SkeletonCapability.RequestCalibration(e.ID, true);
+      }
     }
 
     // ユーザー消失
-    void user_LostUser(ProductionNode node, uint id)
-    {
-      message = "ユーザー消失:" + id;
-    }
-
     void user_LostUser(object sender, UserLostEventArgs e)
     {
-      throw new NotImplementedException();
+      message = "ユーザー消失:" + e.ID;
     }
 
     // ポーズ検出
-    void poseDetect_PoseDetected(ProductionNode node, string pose, int id)
-    {
-      message = "ポーズ検出:" + pose + " ユーザー:" + id;
-
-      // ポーズの検出を停止し、キャリブレーションを開始する
-      user.PoseDetectionCapability.StopPoseDetection(id);
-      user.SkeletonCapability.RequestCalibration(id, true);
-    }
-
     void poseDetect_PoseDetected(object sender, PoseDetectedEventArgs e)
     {
-      throw new NotImplementedException();
+      message = "ポーズ検出:" + e.Pose + " ユーザー:" + e.ID;
+
+      // ポーズの検出を停止し、キャリブレーションを開始する
+      user.PoseDetectionCapability.StopPoseDetection(e.ID);
+      user.SkeletonCapability.RequestCalibration(e.ID, true);
     }
 
     // ポーズ検出終了
-    void poseDetect_PoseEnded(ProductionNode node, string pose, uint id)
-    {
-      message = "ポーズ消失:" + pose + " ユーザー:" + id;
-    }
-
     void poseDetect_PoseEnded(object sender, PoseEndedEventArgs e)
     {
-      throw new NotImplementedException();
+      message = "ポーズ消失:" + e.Pose + " ユーザー:" + e.ID;
     }
 
     // キャリブレーション開始
-    void skelton_CalibrationStart(ProductionNode node, uint id)
-    {
-      message = "キャリブレーション開始:" + id;
-    }
-
     void skelton_CalibrationStart(object sender, CalibrationStartEventArgs e)
     {
-      throw new NotImplementedException();
+      message = "キャリブレーション開始:" + e.ID;
     }
 
     // キャリブレーション終了
-    void skelton_CalibrationEnd(ProductionNode node, int id, bool success)
+    void skelton_CalibrationEnd(object sender, CalibrationEndEventArgs e)
     {
       // キャリブレーション成功
-      if (success) {
-        message = "キャリブレーション成功:" + id;
-        user.SkeletonCapability.StartTracking(id);
+      if (e.Success) {
+        message = "キャリブレーション成功:" + e.ID;
+        user.SkeletonCapability.StartTracking(e.ID);
       }
       // キャリブレーション失敗
       else {
-        message = "キャリブレーション失敗:" + id;
+        message = "キャリブレーション失敗:" + e.ID;
       }
-    }
-
-    void skelton_CalibrationEnd(object sender, CalibrationEndEventArgs e)
-    {
-      throw new NotImplementedException();
     }
 
     // 骨格の線を引く
