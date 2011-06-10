@@ -74,26 +74,16 @@ namespace User
       user.LostUser += new EventHandler<UserLostEventArgs>(user_LostUser);
     }
 
-    void user_LostUser(object sender, UserLostEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
+    // 新しユーザーの検出
     void user_NewUser(object sender, NewUserEventArgs e)
     {
-      throw new NotImplementedException();
-    }
-
-    // 新しユーザーの検出
-    void user_NewUser(ProductionNode node, uint id)
-    {
-      message = "ユーザー検出:" + id;
+      message = "ユーザー検出:" + e.ID;
     }
 
     // ユーザーの消失
-    void user_LostUser(ProductionNode node, uint id)
+    void user_LostUser(object sender, UserLostEventArgs e)
     {
-      message = "ユーザー消失:" + id;
+      message = "ユーザー消失:" + e.ID;
     }
 
     // 描画
