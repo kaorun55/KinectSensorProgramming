@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using OpenNI;
+using NITE;
 
 namespace SwipeDetector
 {
@@ -11,11 +13,11 @@ namespace SwipeDetector
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
+    private Context context;
+    private ImageGenerator image;
 
-    private xnv.SessionManager sessionManager;
-    private xnv.SwipeDetector swipeDetector;
+    private SessionManager sessionManager;
+    private NITE.SwipeDetector swipeDetector;
 
     enum SessionState
     {
@@ -25,7 +27,7 @@ namespace SwipeDetector
     }
 
     private SessionState sessionState = SessionState.NotInSession;
-    private xnv.Direction direction = xnv.Direction.Illegal;
+    private Direction direction = Direction.Illegal;
 
     // 描画用
     private Brush brush = new SolidBrush(Color.Black);
@@ -36,38 +38,38 @@ namespace SwipeDetector
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      context = new Context(CONFIG_XML_PATH);
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // NITEのためのセッションマネージャを作成
-      sessionManager = new xnv.SessionManager(context, "Wave,Click", "RaiseHand");
+      sessionManager = new SessionManager(context, "Wave,Click", "RaiseHand");
 
       // セッションの開始と終了を通知するコールバックを登録する
       sessionManager.SessionStart +=
-            new xnv.SessionManager.SessionStartHandler(sessionManager_SessionStart);
+            new SessionManager.SessionStartHandler(sessionManager_SessionStart);
       sessionManager.SessionEnd +=
-            new xnv.SessionManager.SessionEndHandler(sessionManager_SessionEnd);
+            new SessionManager.SessionEndHandler(sessionManager_SessionEnd);
       sessionManager.SessionFocusProgress +=
-            new xnv.SessionManager.SessionFocusProgressHandler(
+            new SessionManager.SessionFocusProgressHandler(
                                                 sessionManager_SessionFocusProgress);
 
       // Wave(左右運動の検出器)
-      swipeDetector = new xnv.SwipeDetector();
+      swipeDetector = new NITE.SwipeDetector();
       swipeDetector.GeneralSwipe +=
-            new xnv.SwipeDetector.GeneralSwipeHandler(swipeDetector_GeneralSwipe);
+            new NITE.SwipeDetector.GeneralSwipeHandler(swipeDetector_GeneralSwipe);
       swipeDetector.SwipeUp +=
-            new xnv.SwipeDetector.SwipeUpHandler(swipeDetector_SwipeUp);
+            new NITE.SwipeDetector.SwipeUpHandler(swipeDetector_SwipeUp);
       swipeDetector.SwipeDown +=
-            new xnv.SwipeDetector.SwipeDownHandler(swipeDetector_SwipeDown);
+            new NITE.SwipeDetector.SwipeDownHandler(swipeDetector_SwipeDown);
       swipeDetector.SwipeRight +=
-            new xnv.SwipeDetector.SwipeRightHandler(swipeDetector_SwipeRight);
+            new NITE.SwipeDetector.SwipeRightHandler(swipeDetector_SwipeRight);
       swipeDetector.SwipeLeft +=
-            new xnv.SwipeDetector.SwipeLeftHandler(swipeDetector_SwipeLeft);
+            new NITE.SwipeDetector.SwipeLeftHandler(swipeDetector_SwipeLeft);
 
       // リスナーに追加する
       sessionManager.AddListener(swipeDetector);
@@ -84,7 +86,7 @@ namespace SwipeDetector
       sessionManager.Update(context);
 
       // 画像データを取得する
-      xn.ImageMetaData imageMD = image.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
 
       // カメラ画像の作成
       lock (this) {
@@ -95,7 +97,7 @@ namespace SwipeDetector
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3) {
           dst[0] = src[2];
@@ -144,13 +146,13 @@ namespace SwipeDetector
     }
 
     // スワイプの検出を通知する
-    void swipeDetector_GeneralSwipe(xnv.Direction dir, float velocity, float angle)
+    void swipeDetector_GeneralSwipe(Direction dir, float velocity, float angle)
     {
       direction = dir;
     }
 
     // セッションの開始を通知する
-    void sessionManager_SessionStart(ref xn.Point3D position)
+    void sessionManager_SessionStart(ref Point3D position)
     {
       sessionState = SessionState.InSession;
     }
@@ -163,7 +165,7 @@ namespace SwipeDetector
 
     // セッションフォーカスの検出を通知する
     void sessionManager_SessionFocusProgress(string strFocus,
-                                        ref xn.Point3D ptPosition, float fProgress)
+                                        ref Point3D ptPosition, float fProgress)
     {
       sessionState = SessionState.DetectSession;
     }
