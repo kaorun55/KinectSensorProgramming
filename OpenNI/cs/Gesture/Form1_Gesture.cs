@@ -86,21 +86,6 @@ namespace Gesture
       context.StartGeneratingAll();
     }
 
-    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
-    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
-    void gesture_GestureChanged(object sender, EventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
     // 描画
     private unsafe void xnDraw()
     {
@@ -153,22 +138,20 @@ namespace Gesture
     }
 
     // ジェスチャーの検出中
-    void gesture_GestureProgress(ProductionNode node, string strGesture,
-                                      ref Point3D position, float progress)
+    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
     {
       gestureStatus = GestureStatus.Progress;
-      Trace.WriteLine(strGesture + ":" + progress);
+      Trace.WriteLine(e.Gesture + ":" + e.Progress);
     }
 
     // ジェスチャーを検出した
-    void gesture_GestureRecognized(ProductionNode node, string strGesture,
-                          ref Point3D idPosition, ref Point3D endPosition)
+    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
     {
       gestureStatus = GestureStatus.Recognized;
     }
 
     // ジェスチャーが変更された
-    void gesture_GestureChanged(ProductionNode node)
+    void gesture_GestureChanged(object sender, EventArgs e)
     {
       gestureStatus = GestureStatus.Unrecognize;
     }
