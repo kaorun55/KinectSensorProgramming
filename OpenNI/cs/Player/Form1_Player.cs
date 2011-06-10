@@ -16,7 +16,7 @@ namespace Player
     private Context context;
     private ImageGenerator image;
     private DepthGenerator depth;
-    private Player player;
+    private OpenNI.Player player;
 
     private bool isShowImage = true;
     private bool isShowDepth = true;
@@ -31,7 +31,7 @@ namespace Player
       context.OpenFileRecording(RECORD_PATH);
 
       // プレーヤーの作成
-      player = context.FindExistingNode(NodeType.Player) as Player;
+      player = context.FindExistingNode(NodeType.Player) as OpenNI.Player;
       if (player == null) {
         throw new Exception(context.GlobalErrorState);
       }
@@ -52,7 +52,7 @@ namespace Player
       }
       
       // ヒストグラムバッファの作成
-      histogram = new int[depth.GetDeviceMaxDepth()];
+      histogram = new int[depth.DeviceMaxDepth];
     }
 
     // 描画
@@ -70,12 +70,12 @@ namespace Player
         // 書き込み用のビットマップデータを作成
         Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
         BitmapData data = bitmap.LockBits(rect, ImageLockMode.WriteOnly,
-                                                PixelFormat.Format24bppRgb);
+                             System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
         byte* src = (byte*)image.ImageMapPtr.ToPointer();
-        ushort* dep = (ushort*)depth.GetDepthMapPtr().ToPointer();
+        ushort* dep = (ushort*)depth.DepthMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++dep) {
           byte pixel = (byte)histogram[*dep];
@@ -111,7 +111,7 @@ namespace Player
     {
       // 反転する
       if (key == Keys.M) {
-        context.SetGlobalMirror(!context.GetGlobalMirror());
+        context.GlobalMirror = !context.GlobalMirror;
       }
       // 画像の表示/非表示
       else if (key == Keys.I) {

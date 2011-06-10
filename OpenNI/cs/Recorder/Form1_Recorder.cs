@@ -16,7 +16,7 @@ namespace Recorder
     private Context context;
     private ImageGenerator image;
     private DepthGenerator depth;
-    private Recorder recoder;
+    private OpenNI.Recorder recoder;
 
 
     // 初期化
@@ -38,10 +38,10 @@ namespace Recorder
       }
 
       // デプスの座標をイメージに合わせる
-      depth.AlternativeViewpointCapability.SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // レコーダーの作成と記録対象の追加
-      recoder = new Recorder(context);
+      recoder = new OpenNI.Recorder(context);
       recoder.SetDestination(RecordMedium.File, RECORD_PATH);
       recoder.AddNodeToRecording(image);
       recoder.AddNodeToRecording(depth);

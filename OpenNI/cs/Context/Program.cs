@@ -14,7 +14,7 @@ namespace Context
 
                 // XMLをファイルから設定情報を取得して初期化する
                 Console.Write(@"Context.InitFromXmlFile ... ");
-                Context context = new Context(CONFIG_XML_PATH);
+                OpenNI.Context context = new OpenNI.Context(CONFIG_XML_PATH);
                 Console.WriteLine(@"Success");
 
                 // ライセンス情報を取得する
@@ -23,7 +23,7 @@ namespace Context
                 Console.WriteLine(@"Success");
 
                 foreach (License license in licenses) {
-                    Console.WriteLine(license.strVendor + @", " + license.strKey);
+                    Console.WriteLine(license.Vendor + @", " + license.Key);
                 }
 
                 // 登録されたデバイスを取得する

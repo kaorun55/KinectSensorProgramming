@@ -1,4 +1,4 @@
-﻿namespace ViewPointCapability
+﻿namespace ViewpointCapability
 {
   partial class Form1
   {

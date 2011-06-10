@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Threading;
+using OpenNI;
 
 namespace MirrorCapability
 {

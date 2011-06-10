@@ -6,7 +6,7 @@ using System.Threading;
 using System.Diagnostics;
 using OpenNI;
 
-namespace ViewPointCapability
+namespace ViewpointCapability
 {
   public partial class Form1 : Form
   {

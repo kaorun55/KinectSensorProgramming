@@ -40,12 +40,12 @@ namespace DepthMap
       }
 
       // デプスの座標をイメージに合わせる
-      AlternativeViewpointCapability viewPoint = 
+      AlternativeViewpointCapability Viewpoint = 
                                       depth.AlternativeViewpointCapability;
-      viewPoint.SetViewPoint(image);
+      Viewpoint.SetViewpoint(image);
 
       // ヒストグラムバッファの作成
-      histogram = new int[depth.GetDeviceMaxDepth()];
+      histogram = new int[depth.DeviceMaxDepth];
 
     }
 
@@ -64,12 +64,12 @@ namespace DepthMap
         // 書き込み用のビットマップデータを作成
         Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
         BitmapData data = bitmap.LockBits(rect, ImageLockMode.WriteOnly,
-                                                PixelFormat.Format24bppRgb);
+                             System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
         byte* src = (byte*)image.ImageMapPtr.ToPointer();
-        ushort* dep = (ushort*)depth.GetDepthMapPtr().ToPointer();
+        ushort* dep = (ushort*)depth.DepthMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++dep) {
           byte pixel = (byte)histogram[*dep];

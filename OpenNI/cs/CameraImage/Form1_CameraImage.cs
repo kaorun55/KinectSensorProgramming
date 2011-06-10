@@ -40,7 +40,7 @@ namespace CameraImage
         // 書き込み用のビットマップデータを作成
         Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
         BitmapData data = bitmap.LockBits(rect, ImageLockMode.WriteOnly,
-                                                PixelFormat.Format24bppRgb);
+                              System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();

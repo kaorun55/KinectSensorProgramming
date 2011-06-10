@@ -56,7 +56,7 @@ namespace Hands
       context = new Context(CONFIG_XML_PATH);
 
       // 鏡モード(反転)にしない
-      context.SetGlobalMirror(false);
+      context.GlobalMirror = false;
 
       // イメージジェネレータの作成
       image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
@@ -71,7 +71,7 @@ namespace Hands
       }
 
       // デプスの座標をイメージに合わせる
-      depth.AlternativeViewpointCapability.SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // ジェスチャージェネレータの作成
       gesture = context.FindExistingNode(NodeType.Gesture) as GestureGenerator;
@@ -177,7 +177,7 @@ namespace Hands
       gestureStatus = GestureStatus.Recognized;
 
       // 手のトラッキングを開始する
-      hands.StartTracking(ref endPosition);
+      hands.StartTracking(endPosition);
     }
 
     // 手の検出開始
@@ -196,7 +196,7 @@ namespace Hands
     }
 
     // 手の検出終了
-    void hands_HandDestroy(ProductionNode node, uint id, float fTime)
+    void hands_HandDestroy(ProductionNode node, int id, float fTime)
     {
       handStates = HandStatus.NoTracking;
       handPoints.Clear();

@@ -46,7 +46,7 @@ namespace Calibration
       context = new Context(CONFIG_XML_PATH);
 
       // 鏡モード(反転)にしない
-      context.SetGlobalMirror(false);
+      context.GlobalMirror = false;
 
       // イメージジェネレータの作成
       image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
@@ -61,7 +61,7 @@ namespace Calibration
       }
 
       // デプスの座標をイメージに合わせる
-      depth.AlternativeViewpointCapability.SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // ユーザージェネレータの作成
       user = context.FindExistingNode(NodeType.User) as UserGenerator;

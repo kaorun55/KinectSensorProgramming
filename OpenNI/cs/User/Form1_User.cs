@@ -55,7 +55,7 @@ namespace User
       }
 
       // デプスの座標をイメージに合わせる
-      depth.AlternativeViewpointCapability.SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // ユーザージェネレータの作成
       user = context.FindExistingNode(NodeType.User)
@@ -104,7 +104,7 @@ namespace User
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
         byte* src = (byte*)image.ImageMapPtr.ToPointer();
-        ushort* label = (ushort*)sceneMD.SceneMapPtr.ToPointer();
+        ushort* label = (ushort*)sceneMD.LabelMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++label) {
           dst[0] = (byte)(src[2] * colors[*label, 0]);
