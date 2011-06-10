@@ -50,26 +50,17 @@ namespace SwipeDetector
       sessionManager = new SessionManager(context, "Wave,Click", "RaiseHand");
 
       // セッションの開始と終了を通知するコールバックを登録する
-      sessionManager.SessionStart +=
-            new SessionManager.SessionStartHandler(sessionManager_SessionStart);
-      sessionManager.SessionEnd +=
-            new SessionManager.SessionEndHandler(sessionManager_SessionEnd);
-      sessionManager.SessionFocusProgress +=
-            new SessionManager.SessionFocusProgressHandler(
-                                                sessionManager_SessionFocusProgress);
+      sessionManager.SessionStart += new EventHandler<PositionEventArgs>(sessionManager_SessionStart);
+      sessionManager.SessionEnd += new EventHandler(sessionManager_SessionEnd);
+      sessionManager.SessionFocusProgress += new EventHandler<SessionProgressEventArgs>(sessionManager_SessionFocusProgress);
 
       // Wave(左右運動の検出器)
       swipeDetector = new NITE.SwipeDetector();
-      swipeDetector.GeneralSwipe +=
-            new NITE.SwipeDetector.GeneralSwipeHandler(swipeDetector_GeneralSwipe);
-      swipeDetector.SwipeUp +=
-            new NITE.SwipeDetector.SwipeUpHandler(swipeDetector_SwipeUp);
-      swipeDetector.SwipeDown +=
-            new NITE.SwipeDetector.SwipeDownHandler(swipeDetector_SwipeDown);
-      swipeDetector.SwipeRight +=
-            new NITE.SwipeDetector.SwipeRightHandler(swipeDetector_SwipeRight);
-      swipeDetector.SwipeLeft +=
-            new NITE.SwipeDetector.SwipeLeftHandler(swipeDetector_SwipeLeft);
+      swipeDetector.GeneralSwipe += new EventHandler<DirectionVelocityAngleEventArgs>(swipeDetector_GeneralSwipe);
+      swipeDetector.SwipeUp += new EventHandler<VelocityAngleEventArgs>(swipeDetector_SwipeUp);
+      swipeDetector.SwipeDown += new EventHandler<VelocityAngleEventArgs>(swipeDetector_SwipeDown);
+      swipeDetector.SwipeRight += new EventHandler<VelocityAngleEventArgs>(swipeDetector_SwipeRight);
+      swipeDetector.SwipeLeft += new EventHandler<VelocityAngleEventArgs>(swipeDetector_SwipeLeft);
 
       // リスナーに追加する
       sessionManager.AddListener(swipeDetector);
@@ -122,50 +113,49 @@ namespace SwipeDetector
     }
 
     // 左方向への動きを通知する
-    void swipeDetector_SwipeLeft(float velocity, float angle)
+    void swipeDetector_SwipeLeft(object sender, VelocityAngleEventArgs e)
     {
       brush = new SolidBrush(Color.Red);
     }
 
     // 右方向への動きを通知する
-    void swipeDetector_SwipeRight(float velocity, float angle)
+    void swipeDetector_SwipeRight(object sender, VelocityAngleEventArgs e)
     {
       brush = new SolidBrush(Color.Blue);
     }
 
     // 下方向への動きを通知する
-    void swipeDetector_SwipeDown(float velocity, float angle)
+    void swipeDetector_SwipeDown(object sender, VelocityAngleEventArgs e)
     {
       brush = new SolidBrush(Color.Green);
     }
 
     // 上方向への動きを通知する
-    void swipeDetector_SwipeUp(float velocity, float angle)
+    void swipeDetector_SwipeUp(object sender, VelocityAngleEventArgs e)
     {
       brush = new SolidBrush(Color.Yellow);
     }
 
     // スワイプの検出を通知する
-    void swipeDetector_GeneralSwipe(Direction dir, float velocity, float angle)
+    void swipeDetector_GeneralSwipe(object sender, DirectionVelocityAngleEventArgs e)
     {
-      direction = dir;
+      direction = e.Direction;
     }
 
     // セッションの開始を通知する
-    void sessionManager_SessionStart(ref Point3D position)
+    void sessionManager_SessionStart(object sender, PositionEventArgs e)
     {
       sessionState = SessionState.InSession;
     }
 
     // セッションの終了を通知する
-    void sessionManager_SessionEnd()
+    void sessionManager_SessionEnd(object sender, EventArgs e)
     {
       sessionState = SessionState.NotInSession;
     }
 
     // セッションフォーカスの検出を通知する
-    void sessionManager_SessionFocusProgress(string strFocus,
-                                        ref Point3D ptPosition, float fProgress)
+    void sessionManager_SessionFocusProgress(object sender, SessionProgressEventArgs e)
     {
       sessionState = SessionState.DetectSession;
     }

@@ -49,13 +49,9 @@ namespace SessionManager
                               "Wave,Click", "RaiseHand");
 
       // セッションの開始と終了を通知するコールバックを登録する
-      sessionManager.SessionStart +=
-            new NITE.SessionManager.SessionStartHandler(sessionManager_SessionStart);
-      sessionManager.SessionEnd +=
-            new NITE.SessionManager.SessionEndHandler(sessionManager_SessionEnd);
-      sessionManager.SessionFocusProgress +=
-            new NITE.SessionManager.SessionFocusProgressHandler(
-                                              sessionManager_SessionFocusProgress);
+      sessionManager.SessionStart += new EventHandler<PositionEventArgs>(sessionManager_SessionStart);
+      sessionManager.SessionEnd += new EventHandler(sessionManager_SessionEnd);
+      sessionManager.SessionFocusProgress += new EventHandler<SessionProgressEventArgs>(sessionManager_SessionFocusProgress);
     }
 
     // 描画
@@ -97,19 +93,19 @@ namespace SessionManager
     }
 
     // セッションの開始を通知する
-    void sessionManager_SessionStart(ref Point3D position)
+    void sessionManager_SessionStart(object sender, PositionEventArgs e)
     {
       sessionState = SessionState.InSession;
     }
 
     // セッションの終了を通知する
-    void sessionManager_SessionEnd()
+    void sessionManager_SessionEnd(object sender, EventArgs e)
     {
       sessionState = SessionState.NotInSession;
     }
 
     // セッションフォーカスの検出を通知する
-    void sessionManager_SessionFocusProgress(string strFocus, ref Point3D ptPosition, float fProgress)
+    void sessionManager_SessionFocusProgress(object sender, SessionProgressEventArgs e)
     {
       sessionState = SessionState.DetectSession;
     }
