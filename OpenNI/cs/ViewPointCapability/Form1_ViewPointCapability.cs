@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using OpenNI;
 
 namespace ViewPointCapability
 {
@@ -11,9 +12,9 @@ namespace ViewPointCapability
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
 
     private int[] histogram;
 
@@ -27,24 +28,24 @@ namespace ViewPointCapability
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      context = new Context(CONFIG_XML_PATH);
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth) as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth) as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // ビューポイントが変更されたことを通知するコールバックを登録する
-      xn.AlternativeViewPointCapability viewPoint =
-                            depth.GetAlternativeViewPointCap();
-      viewPoint.ViewPointChanged += new xn.StateChangedHandler(
+      AlternativeViewpointCapability viewPoint =
+                            depth.AlternativeViewpointCapability;
+      viewPoint.ViewPointChanged += new StateChangedHandler(
                                           viewPoint_ViewPointChanged);
 
       // ビューポイントのサポート状態を確認する
@@ -60,11 +61,11 @@ namespace ViewPointCapability
     }
 
     // ビューポイントが変化したことを通知する
-    void viewPoint_ViewPointChanged(xn.ProductionNode node)
+    void viewPoint_ViewPointChanged(ProductionNode node)
     {
-      xn.DepthGenerator depth = node as xn.DepthGenerator;
+      DepthGenerator depth = node as DepthGenerator;
       if (depth != null) {
-        isViewPoint = depth.GetAlternativeViewPointCap().IsViewPointAs(image);
+        isViewPoint = depth.AlternativeViewpointCapability.IsViewPointAs(image);
       }
     }
 
@@ -73,8 +74,8 @@ namespace ViewPointCapability
     {
       // ノードの更新を待ち、データを取得する
       context.WaitAndUpdateAll();
-      xn.ImageMetaData imageMD = image.GetMetaData();
-      xn.DepthMetaData depthMD = depth.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
+      DepthMetaData depthMD = depth.GetMetaData();
 
       CalcHist(depthMD);
 
@@ -87,7 +88,7 @@ namespace ViewPointCapability
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
         ushort* dep = (ushort*)depth.GetDepthMapPtr().ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++dep) {
@@ -121,8 +122,8 @@ namespace ViewPointCapability
     {
       // ビューポイントの設定を変更する
       if (key == Keys.V) {
-        xn.AlternativeViewPointCapability viewPoint =
-                                    depth.GetAlternativeViewPointCap();
+        AlternativeViewpointCapability viewPoint =
+                                    depth.AlternativeViewpointCapability;
         // ビューポイントがイメージにセットされている場合は、リセットする
         if (viewPoint.IsViewPointAs(image)) {
           viewPoint.ResetViewPoint();
@@ -135,7 +136,7 @@ namespace ViewPointCapability
     }
 
     // ヒストグラムの計算
-    private unsafe void CalcHist(xn.DepthMetaData depthMD)
+    private unsafe void CalcHist(DepthMetaData depthMD)
     {
       for (int i = 0; i < histogram.Length; ++i) {
         histogram[i] = 0;

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using OpenNI;
 
 namespace Player
 {
@@ -12,10 +13,10 @@ namespace Player
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
     private const string RECORD_PATH = @"../../../../../Data/record.oni";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
-    private xn.Player player;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
+    private Player player;
 
     private bool isShowImage = true;
     private bool isShowDepth = true;
@@ -26,28 +27,28 @@ namespace Player
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context();
+      context = new Context();
       context.OpenFileRecording(RECORD_PATH);
 
       // プレーヤーの作成
-      player = context.FindExistingNode(xn.NodeType.Player) as xn.Player;
+      player = context.FindExistingNode(NodeType.Player) as Player;
       if (player == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // 終端に達したら通知するコールバックを登録する
-      player.EndOfFileReached += new xn.StateChangedHandler(player_EndOfFileReached);
+      player.EndOfFileReached += new StateChangedHandler(player_EndOfFileReached);
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth) as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth) as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
       
       // ヒストグラムバッファの作成
@@ -59,8 +60,8 @@ namespace Player
     {
       // ノードの更新を待ち、データを取得する
       context.WaitAndUpdateAll();
-      xn.ImageMetaData imageMD = image.GetMetaData();
-      xn.DepthMetaData depthMD = depth.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
+      DepthMetaData depthMD = depth.GetMetaData();
 
       CalcHist(depthMD);
 
@@ -73,7 +74,7 @@ namespace Player
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
         ushort* dep = (ushort*)depth.GetDepthMapPtr().ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++dep) {
@@ -123,12 +124,12 @@ namespace Player
     }
 
     // 記録の終了を通知する
-    void player_EndOfFileReached(xn.ProductionNode node)
+    void player_EndOfFileReached(ProductionNode node)
     {
     }
 
     // ヒストグラムの計算
-    private unsafe void CalcHist(xn.DepthMetaData depthMD)
+    private unsafe void CalcHist(DepthMetaData depthMD)
     {
       for (int i = 0; i < histogram.Length; ++i) {
         histogram[i] = 0;

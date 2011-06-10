@@ -1,5 +1,6 @@
 ﻿// C#版は今回のみ「コンソール アプリケーション」で作成しています。
 using System;
+using OpenNI;
 
 namespace Context
 {
@@ -12,30 +13,30 @@ namespace Context
                 string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
                 // XMLをファイルから設定情報を取得して初期化する
-                Console.Write(@"xn.Context.InitFromXmlFile ... ");
-                xn.Context context = new xn.Context(CONFIG_XML_PATH);
+                Console.Write(@"Context.InitFromXmlFile ... ");
+                Context context = new Context(CONFIG_XML_PATH);
                 Console.WriteLine(@"Success");
 
                 // ライセンス情報を取得する
-                Console.Write(@"xn.Context.EnumerateLicenses ... ");
-                xn.License[] licenses = context.EnumerateLicenses();
+                Console.Write(@"Context.EnumerateLicenses ... ");
+                License[] licenses = context.EnumerateLicenses();
                 Console.WriteLine(@"Success");
 
-                foreach (xn.License license in licenses) {
+                foreach (License license in licenses) {
                     Console.WriteLine(license.strVendor + @", " + license.strKey);
                 }
 
                 // 登録されたデバイスを取得する
-                Console.Write(@"xn.Context.EnumerateExistingNodes ... ");
-                xn.NodeInfoList nodeList = context.EnumerateExistingNodes();
+                Console.Write(@"Context.EnumerateExistingNodes ... ");
+                NodeInfoList nodeList = context.EnumerateExistingNodes();
                 Console.WriteLine(@"Success");
 
-                foreach (xn.NodeInfo node in nodeList) {
+                foreach (NodeInfo node in nodeList) {
                     // GetDescriptionの呼び出しで落ちる、、、
                     //Console.WriteLine(node.GetDescription().strName + "," +
                     //                  node.GetDescription().strVendor + "," +
                     //                  node.GetInstanceName() + ",");
-                    Console.WriteLine(node.GetInstanceName());
+                  Console.WriteLine(node.InstanceName);
                 }
 
                 Console.WriteLine(@"Shutdown");

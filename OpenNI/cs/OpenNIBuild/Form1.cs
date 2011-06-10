@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using OpenNI;
 
 namespace OpenNIBuild
 {
@@ -13,7 +14,7 @@ namespace OpenNIBuild
         private void Form1_Load(object sender, EventArgs e)
         {
             try {
-                xn.Context context = new xn.Context();
+                Context context = new Context();
                 MessageBox.Show("Success");
             }
             catch (Exception ex) {

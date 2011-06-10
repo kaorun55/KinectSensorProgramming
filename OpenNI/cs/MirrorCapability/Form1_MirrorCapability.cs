@@ -12,9 +12,9 @@ namespace MirrorCapability
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
 
     private Dictionary<string, bool> mirrorState = new Dictionary<string,bool>();
 
@@ -29,30 +29,30 @@ namespace MirrorCapability
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      context = new Context(CONFIG_XML_PATH);
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image)
-                                              as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image)
+                                              as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth)
-                                              as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth)
+                                              as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスの座標をイメージに合わせる
-      depth.GetAlternativeViewPointCap().SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewPoint(image);
 
       // カメラ画像の
       //   ミラー状態が変更されたことを通知するコールバックを登録
       //   ミラー状態の取得
-      xn.MirrorCapability imageMirror = image.GetMirrorCap();
-      imageMirror.MirrorChangedEvent += new xn.StateChangedHandler(
+      MirrorCapability imageMirror = image.GetMirrorCap();
+      imageMirror.MirrorChangedEvent += new StateChangedHandler(
                                                     Form1_MirrorChangedEvent);
       mirrorState.Add(image.ToString(), imageMirror.IsMirrored());
 
@@ -60,8 +60,8 @@ namespace MirrorCapability
       // デプスの
       //   ミラー状態が変更されたことを通知するコールバックを登録
       //   ミラー状態の取得
-      xn.MirrorCapability depthMirror = depth.GetMirrorCap();
-      depthMirror.MirrorChangedEvent += new xn.StateChangedHandler(
+      MirrorCapability depthMirror = depth.GetMirrorCap();
+      depthMirror.MirrorChangedEvent += new StateChangedHandler(
                                                     Form1_MirrorChangedEvent);
       mirrorState.Add(depth.ToString(), depthMirror.IsMirrored());
 
@@ -70,9 +70,9 @@ namespace MirrorCapability
     }
 
     // ミラー状態が変化したときに通知する
-    void Form1_MirrorChangedEvent(xn.ProductionNode node)
+    void Form1_MirrorChangedEvent(ProductionNode node)
     {
-      xn.Generator generator = node as xn.Generator;
+      Generator generator = node as Generator;
       if (generator != null) {
         mirrorState[generator.ToString()] = generator.GetMirrorCap().IsMirrored();
       }
@@ -83,8 +83,8 @@ namespace MirrorCapability
     {
       // ノードの更新を待ち、データを取得する
       context.WaitAndUpdateAll();
-      xn.ImageMetaData imageMD = image.GetMetaData();
-      xn.DepthMetaData depthMD = depth.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
+      DepthMetaData depthMD = depth.GetMetaData();
 
       CalcHist(depthMD);
 
@@ -97,7 +97,7 @@ namespace MirrorCapability
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
         ushort* dep = (ushort*)depth.GetDepthMapPtr().ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++dep) {
@@ -137,18 +137,18 @@ namespace MirrorCapability
       }
       // イメージのみ反転する
       else if (key == Keys.I) {
-        xn.MirrorCapability mirror = image.GetMirrorCap();
+        MirrorCapability mirror = image.GetMirrorCap();
         mirror.SetMirror(!mirror.IsMirrored());
       }
       // デプスのみ反転する
       else if (key == Keys.D) {
-        xn.MirrorCapability mirror = depth.GetMirrorCap();
+        MirrorCapability mirror = depth.GetMirrorCap();
         mirror.SetMirror(!mirror.IsMirrored());
       }
     }
 
     // ヒストグラムの計算
-    private unsafe void CalcHist(xn.DepthMetaData depthMD)
+    private unsafe void CalcHist(DepthMetaData depthMD)
     {
       for (int i = 0; i < histogram.Length; ++i) {
         histogram[i] = 0;
