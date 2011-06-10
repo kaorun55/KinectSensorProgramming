@@ -101,31 +101,6 @@ namespace Hands
       context.StartGeneratingAll();
     }
 
-    void hands_HandDestroy(object sender, HandDestroyEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
-    void hands_HandUpdate(object sender, HandUpdateEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
-    void hands_HandCreate(object sender, HandCreateEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
-    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
-    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
-    {
-      throw new NotImplementedException();
-    }
-
     // 描画
     private unsafe void xnDraw()
     {
@@ -186,45 +161,46 @@ namespace Hands
     }
 
     // ジェスチャーの検出中
-    void gesture_GestureProgress(ProductionNode node, string strGesture,
-                                        ref Point3D position, float progress)
+    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
     {
       gestureStatus = GestureStatus.Progress;
     }
 
     // ジェスチャーを検出した
-    void gesture_GestureRecognized(ProductionNode node, string strGesture,
-                          ref Point3D idPosition, ref Point3D endPosition)
+    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
     {
       gestureStatus = GestureStatus.Recognized;
 
       // 手のトラッキングを開始する
-      hands.StartTracking(endPosition);
+      hands.StartTracking(e.EndPosition);
     }
 
     // 手の検出開始
-    void hands_HandCreate(ProductionNode node, uint id,
-                                ref Point3D position, float fTime)
+    void hands_HandCreate(object sender, HandCreateEventArgs e)
     {
       handStates = HandStatus.Create;
     }
 
     // 手の位置の更新
-    void hands_HandUpdate(ProductionNode node, uint id,
-                                ref Point3D position, float fTime)
+    void hands_HandUpdate(object sender, HandUpdateEventArgs e)
     {
       handStates = HandStatus.Update;
-      handPoints.Enqueue(position);
+      handPoints.Enqueue(e.Position);
     }
 
     // 手の検出終了
-    void hands_HandDestroy(ProductionNode node, int id, float fTime)
+    void hands_HandDestroy(object sender, HandDestroyEventArgs e)
     {
-      handStates = HandStatus.NoTracking;
-      handPoints.Clear();
+      // 1.1.0.41 ではHandGenerator.StopTrackingでHandDestroyイベントが
+      // 呼び出されるようで再帰になってしまう。
+      // そのためトラッキング停止状態でない場合のみ、トラッキング停止をする
+      if (handStates != HandStatus.NoTracking) {
+        handStates = HandStatus.NoTracking;
+        handPoints.Clear();
 
-      // トラッキングの停止
-      hands.StopTracking(id);
+        // トラッキングの停止
+        hands.StopTracking(e.UserID);
+      }
     }
   }
 }
