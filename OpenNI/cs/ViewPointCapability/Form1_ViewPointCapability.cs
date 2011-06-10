@@ -59,15 +59,10 @@ namespace ViewpointCapability
       histogram = new int[depth.DeviceMaxDepth];
     }
 
+    // ビューポイントが変化したことを通知する
     void Viewpoint_ViewpointChanged(object sender, EventArgs e)
     {
-      throw new NotImplementedException();
-    }
-
-    // ビューポイントが変化したことを通知する
-    void Viewpoint_ViewpointChanged(ProductionNode node)
-    {
-      DepthGenerator depth = node as DepthGenerator;
+      DepthGenerator depth = sender as DepthGenerator;
       if (depth != null) {
         isViewpoint = depth.AlternativeViewpointCapability.IsViewpointAs(image);
       }
