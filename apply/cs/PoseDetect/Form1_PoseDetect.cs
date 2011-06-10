@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using OpenNI;
 
 namespace PoseDetect
 {
@@ -11,11 +12,11 @@ namespace PoseDetect
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
-    private xn.UserGenerator user;
-    private xn.SkeletonCapability skelton;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
+    private UserGenerator user;
+    private SkeletonCapability skelton;
 
     private string pose = string.Empty;
 
@@ -42,30 +43,30 @@ namespace PoseDetect
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      context = new Context(CONFIG_XML_PATH);
 
       // 鏡モード(反転)にしない
-      context.SetGlobalMirror(false);
+      context.GlobalMirror = false;
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth) as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth) as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスの座標をイメージに合わせる
-      depth.GetAlternativeViewPointCap().SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // ユーザージェネレータの作成
-      user = context.FindExistingNode(xn.NodeType.User) as xn.UserGenerator;
+      user = context.FindExistingNode(NodeType.User) as UserGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // ユーザー検出機能をサポートしているか確認
@@ -74,40 +75,32 @@ namespace PoseDetect
       }
 
       // ユーザー認識のコールバックを登録
-      user.NewUser += new xn.UserGenerator.NewUserHandler(user_NewUser);
-      user.LostUser += new xn.UserGenerator.LostUserHandler(user_LostUser);
+      user.NewUser += new EventHandler<NewUserEventArgs>(user_NewUser);
+      user.LostUser += new EventHandler<UserLostEventArgs>(user_LostUser);
 
       //キャリブレーションにポーズが必要か確認
-      skelton = user.GetSkeletonCap();
-      if (skelton.NeedPoseForCalibration()) {
+      skelton = user.SkeletonCapability;
+      if (skelton.DoesNeedPoseForCalibration) {
         // ポーズ検出のサポートチェック
         if (!user.IsCapabilitySupported("User::PoseDetection")) {
           throw new Exception("ユーザー検出をサポートしていません");
         }
 
         // キャリブレーションポーズの取得
-        pose = skelton.GetCalibrationPose();
+        pose = skelton.CalibrationPose;
 
         // ポーズ検出のコールバックを登録
-        xn.PoseDetectionCapability poseDetect = user.GetPoseDetectionCap();
-        poseDetect.PoseDetected +=
-            new xn.PoseDetectionCapability.PoseDetectedHandler(
-                                          poseDetect_PoseDetected);
-        poseDetect.PoseEnded +=
-            new xn.PoseDetectionCapability.PoseEndedHandler(
-                                          poseDetect_PoseEnded);
+        PoseDetectionCapability poseDetect = user.PoseDetectionCapability;
+        poseDetect.PoseDetected += new EventHandler<PoseDetectedEventArgs>(poseDetect_PoseDetected);
+        poseDetect.PoseEnded += new EventHandler<PoseEndedEventArgs>(poseDetect_PoseEnded);
       }
 
       // キャリブレーションのコールバックを登録
-      skelton.CalibrationStart +=
-            new xn.SkeletonCapability.CalibrationStartHandler(
-                                        skelton_CalibrationStart);
-      skelton.CalibrationEnd +=
-            new xn.SkeletonCapability.CalibrationEndHandler(
-                                        skelton_CalibrationEnd);
+      skelton.CalibrationStart += new EventHandler<CalibrationStartEventArgs>(skelton_CalibrationStart);
+      skelton.CalibrationEnd += new EventHandler<CalibrationEndEventArgs>(skelton_CalibrationEnd);
 
       // すべてをトラッキングする
-      skelton.SetSkeletonProfile(xn.SkeletonProfile.All);
+      skelton.SetSkeletonProfile(SkeletonProfile.All);
 
       // ジェスチャーの検出開始
       context.StartGeneratingAll();
@@ -118,8 +111,8 @@ namespace PoseDetect
     {
       // カメライメージの更新を待ち、画像データを取得する
       context.WaitOneUpdateAll(image);
-      xn.ImageMetaData imageMD = image.GetMetaData();
-      xn.SceneMetaData sceneMD = user.GetUserPixels(0);
+      ImageMetaData imageMD = image.GetMetaData();
+      SceneMetaData sceneMD = user.GetUserPixels(0);
 
       // カメラ画像の作成
       lock (this) {
@@ -130,8 +123,8 @@ namespace PoseDetect
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
-        ushort* label = (ushort*)sceneMD.SceneMapPtr.ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
+        ushort* label = (ushort*)sceneMD.LabelMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++label) {
           dst[0] = (byte)(src[2] * colors[*label, 0]);
@@ -142,9 +135,9 @@ namespace PoseDetect
         bitmap.UnlockBits(data);
 
         // スケルトンの描画
-        foreach (uint id in user.GetUsers()) {
+        foreach (int id in user.GetUsers()) {
           // トラッキング対象のユーザーでなければ次へ
-          if (!user.GetSkeletonCap().IsTracking(id)) {
+          if (!user.SkeletonCapability.IsTracking(id)) {
             continue;
           }
 
@@ -169,82 +162,80 @@ namespace PoseDetect
 
 
     // ユーザー検出
-    void user_NewUser(xn.ProductionNode node, uint id)
+    void user_NewUser(object sender, NewUserEventArgs e)
     {
-      message = "ユーザー検出:" + id;
+      message = "ユーザー検出:" + e.ID;
 
       // ポーズの検出が必要であれば、ポーズの検出を開始する
       if (!string.IsNullOrEmpty(pose)) {
-        user.GetPoseDetectionCap().StartPoseDetection(pose, id);
+        user.PoseDetectionCapability.StartPoseDetection(pose, e.ID);
       }
       // ポーズの検出が不要であれば、キャリブレーションを開始する
       else {
-        user.GetSkeletonCap().RequestCalibration(id, true);
+        user.SkeletonCapability.RequestCalibration(e.ID, true);
       }
     }
 
     // ユーザー消失
-    void user_LostUser(xn.ProductionNode node, uint id)
+    void user_LostUser(object sender, UserLostEventArgs e)
     {
-      message = "ユーザー消失:" + id;
+      message = "ユーザー消失:" + e.ID;
     }
 
     // ポーズ検出
-    void poseDetect_PoseDetected(xn.ProductionNode node, string pose, uint id)
+    void poseDetect_PoseDetected(object sender, PoseDetectedEventArgs e)
     {
-      message = "ポーズ検出:" + pose + " ユーザー:" + id;
+      message = "ポーズ検出:" + pose + " ユーザー:" + e.ID;
 
       // ポーズの検出を停止し、キャリブレーションを開始する
-      user.GetPoseDetectionCap().StopPoseDetection(id);
-      user.GetSkeletonCap().RequestCalibration(id, true);
+      user.PoseDetectionCapability.StopPoseDetection(e.ID);
+      user.SkeletonCapability.RequestCalibration(e.ID, true);
     }
 
     // ポーズ検出終了
-    void poseDetect_PoseEnded(xn.ProductionNode node, string pose, uint id)
+    void poseDetect_PoseEnded(object sender, PoseEndedEventArgs e)
     {
-      message = "ポーズ消失:" + pose + " ユーザー:" + id;
+      message = "ポーズ消失:" + e.Pose + " ユーザー:" + e.ID;
     }
 
     // キャリブレーション開始
-    void skelton_CalibrationStart(xn.ProductionNode node, uint id)
+    void skelton_CalibrationStart(object sender, CalibrationStartEventArgs e)
     {
-      message = "キャリブレーション開始:" + id;
+      message = "キャリブレーション開始:" + e.ID;
     }
 
     // キャリブレーション終了
-    void skelton_CalibrationEnd(xn.ProductionNode node, uint id, bool success)
+    void skelton_CalibrationEnd(object sender, CalibrationEndEventArgs e)
     {
       // キャリブレーション成功
-      if (success) {
-        message = "キャリブレーション成功:" + id;
-        user.GetSkeletonCap().StartTracking(id);
+      if (e.Success) {
+        message = "キャリブレーション成功:" + e.ID;
+        user.SkeletonCapability.StartTracking(e.ID);
       }
       // キャリブレーション失敗
       else {
-        message = "キャリブレーション失敗:" + id;
+        message = "キャリブレーション失敗:" + e.ID;
       }
     }
 
     // パーツの座標を取得する
-    xn.SkeletonJointPosition GetJointPosition(uint player, xn.SkeletonJoint eJoint1)
+    SkeletonJointPosition GetJointPosition(int player, SkeletonJoint eJoint1)
     {
-      xn.SkeletonJointPosition joint = new xn.SkeletonJointPosition();
-      skelton.GetSkeletonJointPosition(player, eJoint1, ref joint);
-      return joint;
+      return skelton.GetSkeletonJointPosition(player, eJoint1);
     }
 
     // 骨格の線を引く
-    void DrawLine(uint player, xn.SkeletonJoint eJoint1, xn.SkeletonJoint eJoint2)
+    void DrawLine(int player, SkeletonJoint eJoint1, SkeletonJoint eJoint2)
     {
       // 各箇所の座標を取得する
-      xn.SkeletonJointPosition joint1 = GetJointPosition(player, eJoint1);
-      xn.SkeletonJointPosition joint2 = GetJointPosition(player, eJoint2);
-      if (joint1.fConfidence < 0.5 || joint2.fConfidence < 0.5) {
+      SkeletonJointPosition joint1 = GetJointPosition(player, eJoint1);
+      SkeletonJointPosition joint2 = GetJointPosition(player, eJoint2);
+      if (joint1.Confidence < 0.5 || joint2.Confidence < 0.5) {
         return;
       }
 
       // 現実の座標から画面の座標に変換する
-      xn.Point3D[] pt = new xn.Point3D[] { joint1.position, joint2.position };
+      Point3D[] pt = new Point3D[] { joint1.Position, joint2.Position };
       pt = depth.ConvertRealWorldToProjective(pt);
 
       Graphics g = Graphics.FromImage(bitmap);
@@ -252,47 +243,47 @@ namespace PoseDetect
     }
 
     // スケルトンを描画する
-    private void DrawSkeleton(uint player)
+    private void DrawSkeleton(int player)
     {
-      DrawLine(player, xn.SkeletonJoint.Head, xn.SkeletonJoint.Neck);
+      DrawLine(player, SkeletonJoint.Head, SkeletonJoint.Neck);
 
-      DrawLine(player, xn.SkeletonJoint.Neck, xn.SkeletonJoint.LeftShoulder);
-      DrawLine(player, xn.SkeletonJoint.LeftShoulder, xn.SkeletonJoint.LeftElbow);
-      DrawLine(player, xn.SkeletonJoint.LeftElbow, xn.SkeletonJoint.LeftHand);
+      DrawLine(player, SkeletonJoint.Neck, SkeletonJoint.LeftShoulder);
+      DrawLine(player, SkeletonJoint.LeftShoulder, SkeletonJoint.LeftElbow);
+      DrawLine(player, SkeletonJoint.LeftElbow, SkeletonJoint.LeftHand);
 
-      DrawLine(player, xn.SkeletonJoint.Neck, xn.SkeletonJoint.RightShoulder);
-      DrawLine(player, xn.SkeletonJoint.RightShoulder, xn.SkeletonJoint.RightElbow);
-      DrawLine(player, xn.SkeletonJoint.RightElbow, xn.SkeletonJoint.RightHand);
+      DrawLine(player, SkeletonJoint.Neck, SkeletonJoint.RightShoulder);
+      DrawLine(player, SkeletonJoint.RightShoulder, SkeletonJoint.RightElbow);
+      DrawLine(player, SkeletonJoint.RightElbow, SkeletonJoint.RightHand);
 
-      DrawLine(player, xn.SkeletonJoint.LeftShoulder, xn.SkeletonJoint.Torso);
-      DrawLine(player, xn.SkeletonJoint.RightShoulder, xn.SkeletonJoint.Torso);
+      DrawLine(player, SkeletonJoint.LeftShoulder, SkeletonJoint.Torso);
+      DrawLine(player, SkeletonJoint.RightShoulder, SkeletonJoint.Torso);
 
-      DrawLine(player, xn.SkeletonJoint.Torso, xn.SkeletonJoint.LeftHip);
-      DrawLine(player, xn.SkeletonJoint.LeftHip, xn.SkeletonJoint.LeftKnee);
-      DrawLine(player, xn.SkeletonJoint.LeftKnee, xn.SkeletonJoint.LeftFoot);
+      DrawLine(player, SkeletonJoint.Torso, SkeletonJoint.LeftHip);
+      DrawLine(player, SkeletonJoint.LeftHip, SkeletonJoint.LeftKnee);
+      DrawLine(player, SkeletonJoint.LeftKnee, SkeletonJoint.LeftFoot);
 
-      DrawLine(player, xn.SkeletonJoint.Torso, xn.SkeletonJoint.RightHip);
-      DrawLine(player, xn.SkeletonJoint.RightHip, xn.SkeletonJoint.RightKnee);
-      DrawLine(player, xn.SkeletonJoint.RightKnee, xn.SkeletonJoint.RightFoot);
+      DrawLine(player, SkeletonJoint.Torso, SkeletonJoint.RightHip);
+      DrawLine(player, SkeletonJoint.RightHip, SkeletonJoint.RightKnee);
+      DrawLine(player, SkeletonJoint.RightKnee, SkeletonJoint.RightFoot);
 
-      DrawLine(player, xn.SkeletonJoint.LeftHip, xn.SkeletonJoint.RightHip);
+      DrawLine(player, SkeletonJoint.LeftHip, SkeletonJoint.RightHip);
     }
 
     // 腕の交差点を描画する
-    private void DrawCrossPoint(uint player)
+    private void DrawCrossPoint(int player)
     {
-      xn.Point3D[] parts = new xn.Point3D[4] {
-        GetJointPosition(player, xn.SkeletonJoint.LeftElbow).position,
-        GetJointPosition(player, xn.SkeletonJoint.LeftHand).position,
-        GetJointPosition(player, xn.SkeletonJoint.RightElbow).position,
-        GetJointPosition(player, xn.SkeletonJoint.RightHand).position,
+      Point3D[] parts = new Point3D[4] {
+        GetJointPosition(player, SkeletonJoint.LeftElbow).Position,
+        GetJointPosition(player, SkeletonJoint.LeftHand).Position,
+        GetJointPosition(player, SkeletonJoint.RightElbow).Position,
+        GetJointPosition(player, SkeletonJoint.RightHand).Position,
       };
 
       // 腕が交差している場合に、交差している座標を表示する
       bool isCross = CrossHitCheck(parts[0], parts[1], parts[2], parts[3]);
       if (isCross) {
         parts = depth.ConvertRealWorldToProjective(parts);
-        xn.Point3D point = GetCrossPoint(parts[0], parts[1], parts[2], parts[3]);
+        Point3D point = GetCrossPoint(parts[0], parts[1], parts[2], parts[3]);
 
         Graphics g = Graphics.FromImage(bitmap);
         g.DrawEllipse(new Pen(Color.Red, 10), 
@@ -302,7 +293,7 @@ namespace PoseDetect
 
     // こちらのページを参考にしました
     // http://net2.cocolog-nifty.com/blog/2009/11/post-8792.html
-    bool CrossHitCheck(xn.Point3D a1, xn.Point3D a2, xn.Point3D b1, xn.Point3D b2)
+    bool CrossHitCheck(Point3D a1, Point3D a2, Point3D b1, Point3D b2)
     {
       // 外積:axb = ax*by - ay*bx
       // 外積と使用して交差判定を行なう
@@ -321,9 +312,9 @@ namespace PoseDetect
 
     // こちらのページを参考にしました
     // http://net2.cocolog-nifty.com/blog/2009/11/post-dbea.html
-    xn.Point3D GetCrossPoint(xn.Point3D a1, xn.Point3D a2, xn.Point3D b1, xn.Point3D b2)
+    Point3D GetCrossPoint(Point3D a1, Point3D a2, Point3D b1, Point3D b2)
     {
-      xn.Point3D tmp = new xn.Point3D();// 計算用
+      Point3D tmp = new Point3D();// 計算用
       // １つめの式
       float v1a = (a1.Y - a2.Y) / (a1.X - a2.X);
       float v1b = (a1.X * a2.Y - a1.Y * a2.X) / (a1.X - a2.X);

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using OpenNI;
 
 namespace DrawUser
 {
@@ -11,10 +12,10 @@ namespace DrawUser
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
-    private xn.UserGenerator user;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
+    private UserGenerator user;
 
     private bool isBackground = false;
 
@@ -22,27 +23,27 @@ namespace DrawUser
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      context = new Context(CONFIG_XML_PATH);
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth) as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth) as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスの座標をイメージに合わせる
-      depth.GetAlternativeViewPointCap().SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // ユーザージェネレータの作成
-      user = context.FindExistingNode(xn.NodeType.User) as xn.UserGenerator;
+      user = context.FindExistingNode(NodeType.User) as UserGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // ユーザー検出機能をサポートしているか確認
@@ -56,8 +57,8 @@ namespace DrawUser
     {
       // カメライメージの更新を待ち、画像データを取得する
       context.WaitOneUpdateAll(image);
-      xn.ImageMetaData imageMD = image.GetMetaData();
-      xn.SceneMetaData sceneMD = user.GetUserPixels(0);
+      ImageMetaData imageMD = image.GetMetaData();
+      SceneMetaData sceneMD = user.GetUserPixels(0);
 
       // カメラ画像の作成
       lock (this) {
@@ -68,8 +69,8 @@ namespace DrawUser
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
-        ushort* label = (ushort*)sceneMD.SceneMapPtr.ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
+        ushort* label = (ushort*)sceneMD.LabelMapPtr.ToPointer();
 
         // 画面用の描画
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++label) {
