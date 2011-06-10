@@ -32,10 +32,10 @@ namespace Context
                 Console.WriteLine(@"Success");
 
                 foreach (NodeInfo node in nodeList) {
-                    // GetDescriptionの呼び出しで落ちる、、、
-                    //Console.WriteLine(node.GetDescription().strName + "," +
-                    //                  node.GetDescription().strVendor + "," +
-                    //                  node.GetInstanceName() + ",");
+                  // GetDescriptionの呼び出しで落ちる、、、
+                  //Console.WriteLine(node.Description.Name + "," +
+                  //                  node.Description.Vendor + "," +
+                  //                  node.InstanceName + ",");
                   Console.WriteLine(node.InstanceName);
                 }
 
