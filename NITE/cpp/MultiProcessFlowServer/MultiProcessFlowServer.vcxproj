@@ -58,7 +58,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>XnVNITE_1_3_1.lib;openNI.lib;cv210.lib;highgui210.lib;cxcore210.lib;cvaux210.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XnVNITE_1_4_0.lib;openNI.lib;cv210.lib;highgui210.lib;cxcore210.lib;cvaux210.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\OpenCV2.1\lib;C:\Program Files\OpenNI\Lib;C:\Program Files\PrimeSense\NITE\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>

@@ -14,7 +14,8 @@ namespace Context
 
                 // XMLをファイルから設定情報を取得して初期化する
                 Console.Write(@"Context.InitFromXmlFile ... ");
-                OpenNI.Context context = new OpenNI.Context(CONFIG_XML_PATH);
+                ScriptNode scriptNode;
+                OpenNI.Context context = OpenNI.Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
                 Console.WriteLine(@"Success");
 
                 // ライセンス情報を取得する

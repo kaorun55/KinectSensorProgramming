@@ -43,7 +43,8 @@ namespace Calibration
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new Context(CONFIG_XML_PATH);
+      ScriptNode scriptNode;
+      context = Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
 
       // 鏡モード(反転)にしない
       context.GlobalMirror = false;
@@ -92,12 +93,12 @@ namespace Calibration
         // ポーズ検出のコールバックを登録
         PoseDetectionCapability poseDetect = user.PoseDetectionCapability;
         poseDetect.PoseDetected += new EventHandler<PoseDetectedEventArgs>(poseDetect_PoseDetected);
-        poseDetect.PoseEnded += new EventHandler<PoseEndedEventArgs>(poseDetect_PoseEnded);
+        poseDetect.OutOfPose += new EventHandler<OutOfPoseEventArgs>( poseDetect_OutOfPose );
       }
 
       // キャリブレーションのコールバックを登録
       skelton.CalibrationStart += new EventHandler<CalibrationStartEventArgs>(skelton_CalibrationStart);
-      skelton.CalibrationEnd += new EventHandler<CalibrationEndEventArgs>(skelton_CalibrationEnd);
+      skelton.CalibrationComplete += new EventHandler<CalibrationProgressEventArgs>( skelton_CalibrationComplete );
 
       // すべてをトラッキングする
       skelton.SetSkeletonProfile(SkeletonProfile.All);
@@ -213,7 +214,7 @@ namespace Calibration
     }
 
     // ポーズ検出終了
-    void poseDetect_PoseEnded(object sender, PoseEndedEventArgs e)
+    void poseDetect_OutOfPose( object sender, OutOfPoseEventArgs e )
     {
       message = "ポーズ消失:" + e.Pose + " ユーザー:" + e.ID;
     }
@@ -225,10 +226,10 @@ namespace Calibration
     }
 
     // キャリブレーション終了
-    void skelton_CalibrationEnd(object sender, CalibrationEndEventArgs e)
+    void skelton_CalibrationComplete( object sender, CalibrationProgressEventArgs e )
     {
       // キャリブレーション成功
-      if (e.Success) {
+      if (e.Status == CalibrationStatus.OK) {
         message = "キャリブレーション成功:" + e.ID;
         user.SkeletonCapability.StartTracking(e.ID);
       }

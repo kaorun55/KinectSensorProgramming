@@ -15,7 +15,7 @@ namespace OpenNIBuild
         {
             try {
                 Context context = new Context();
-                MessageBox.Show("Success");
+                MessageBox.Show( "Success" );
             }
             catch (Exception ex) {
                 MessageBox.Show(ex.Message);

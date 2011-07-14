@@ -43,7 +43,8 @@ namespace PoseDetect
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new Context(CONFIG_XML_PATH);
+      ScriptNode scriptNode;
+      context = Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
 
       // 鏡モード(反転)にしない
       context.GlobalMirror = false;

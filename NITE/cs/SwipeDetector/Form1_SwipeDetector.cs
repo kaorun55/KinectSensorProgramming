@@ -27,7 +27,7 @@ namespace SwipeDetector
     }
 
     private SessionState sessionState = SessionState.NotInSession;
-    private Direction direction = Direction.Illegal;
+    private NITE.Direction direction = NITE.Direction.Illegal;
 
     // 描画用
     private Brush brush = new SolidBrush(Color.Black);
@@ -38,7 +38,8 @@ namespace SwipeDetector
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new Context(CONFIG_XML_PATH);
+      ScriptNode scriptNode;
+      context = Context.CreateFromXmlFile(CONFIG_XML_PATH, out scriptNode);
 
       // イメージジェネレータの作成
       image = context.FindExistingNode(NodeType.Image) as ImageGenerator;

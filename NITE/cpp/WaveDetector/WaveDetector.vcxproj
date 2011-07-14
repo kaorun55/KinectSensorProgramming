@@ -58,7 +58,7 @@
       <AdditionalIncludeDirectories>C:\OpenCV2.1\include;C:\Program Files\OpenNI\Include;C:\Program Files\PrimeSense\NITE\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>XnVNITE_1_3_1.lib;openNI.lib;cv210.lib;highgui210.lib;cxcore210.lib;cvaux210.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XnVNITE_1_4_0.lib;openNI.lib;cv210.lib;highgui210.lib;cxcore210.lib;cvaux210.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>

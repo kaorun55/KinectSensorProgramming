@@ -36,7 +36,8 @@ namespace SessionManager
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new Context(CONFIG_XML_PATH);
+      ScriptNode scriptNode;
+      context = Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
 
       // イメージジェネレータの作成
       image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
