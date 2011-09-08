@@ -94,9 +94,26 @@ T CreateGenerator(const xn::NodeInfo& node)
   return g;
 }
 
+void showOepnNIVersion()
+{
+  XnVersion version = { 0 };
+  XnStatus rc = xnGetVersion( &version );
+  if (rc != XN_STATUS_OK) {
+    throw std::runtime_error(::xnGetStatusString(rc));
+  }
+
+  std::cout << "OpenNI Version is " << 
+      (XnUInt32)version.nMajor << "." << 
+      (XnUInt32)version.nMinor << "." << 
+      (XnUInt32)version.nMaintenance << "." << 
+      (XnUInt32)version.nBuild << std::endl;
+}
+
 int main (int argc, char * argv[])
 {
   try {
+    showOepnNIVersion();
+
     XnStatus rc;
     
     xn::Context context;
