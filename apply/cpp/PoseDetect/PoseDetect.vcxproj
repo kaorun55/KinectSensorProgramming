@@ -41,11 +41,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\OpenCV2.1\include;C:\Program Files\OpenNI\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenCV2.1\include;$(OPEN_NI_INCLUDE)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\OpenCV2.1\lib;C:\Program Files\OpenNI\Lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\OpenCV2.1\lib;$(OPEN_NI_LIB)</AdditionalLibraryDirectories>
       <AdditionalDependencies>cv210.lib;highgui210.lib;cxcore210.lib;cvaux210.lib;OpenNI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

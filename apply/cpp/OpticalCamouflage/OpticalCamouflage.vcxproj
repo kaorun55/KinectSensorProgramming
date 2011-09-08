@@ -52,13 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\OpenCV2.1\include;C:\Program Files\OpenNI\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenCV2.1\include;$(OPEN_NI_INCLUDE)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>cv210.lib;highgui210.lib;cxcore210.lib;cvaux210.lib;OpenNI.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\OpenCV2.1\lib;C:\Program Files\OpenNI\Lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\OpenCV2.1\lib;$(OPEN_NI_LIB)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
