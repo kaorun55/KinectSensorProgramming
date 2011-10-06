@@ -200,7 +200,8 @@ namespace Hands
                 handPoints.Clear();
 
                 // トラッキングの停止
-                hands.StopTracking( e.UserID );
+                // これがあるとおちるので、コメント
+                //hands.StopTracking( e.UserID );
             }
         }
     }
