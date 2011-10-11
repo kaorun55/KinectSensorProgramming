@@ -120,18 +120,22 @@ namespace ViewpointCapability
     // キーイベント
     private void xnKeyDown(Keys key)
     {
-      // ビューポイントの設定を変更する
-      if (key == Keys.V) {
-        AlternativeViewpointCapability Viewpoint =
+      try {
+        // ビューポイントの設定を変更する
+        if ( key == Keys.V ) {
+          AlternativeViewpointCapability Viewpoint =
                                     depth.AlternativeViewpointCapability;
-        // ビューポイントがイメージにセットされている場合は、リセットする
-        if (Viewpoint.IsViewpointAs(image)) {
-          Viewpoint.ResetViewpoint();
+          // ビューポイントがイメージにセットされている場合は、リセットする
+          if ( Viewpoint.IsViewpointAs( image ) ) {
+            Viewpoint.ResetViewpoint();
+          }
+          // ビューポイントがイメージにセットされていない場合は、イメージをセットする
+          else {
+            Viewpoint.SetViewpoint( image );
+          }
         }
-        // ビューポイントがイメージにセットされていない場合は、イメージをセットする
-        else {
-          Viewpoint.SetViewpoint(image);
-        }
+      }
+      catch {
       }
     }
 

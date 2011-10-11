@@ -79,7 +79,9 @@ namespace Player
     {
       try {
         lock (this) {
-          e.Graphics.DrawImage(bitmap, 0, 0);
+          if ( bitmap != null ) {
+            e.Graphics.DrawImage( bitmap, 0, 0 );
+          }
         }
       }
       catch (Exception ex) {

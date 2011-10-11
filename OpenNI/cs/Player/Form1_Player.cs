@@ -28,7 +28,8 @@ namespace Player
     {
       // コンテキストの初期化
       context = new Context();
-      // OpenFileRecordingExを使うように促されるが、使用するとアクセスバイオレーションになる
+      // OpenNI 1.3.2.1 : OpenFileRecordingExを使うように促されるが、使用するとアクセスバイオレーションになる
+      // OpenNI 1.3.4.3 : OpenFileRecordingExを使うと起動しない
       context.OpenFileRecording(RECORD_PATH);
 
       // プレーヤーの作成

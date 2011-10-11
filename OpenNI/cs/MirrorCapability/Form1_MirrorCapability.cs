@@ -131,19 +131,23 @@ namespace MirrorCapability
     // キーイベント
     private void xnKeyDown(Keys key)
     {
-      // すべてを反転する
-      if (key == Keys.M) {
-        context.GlobalMirror = !context.GlobalMirror;
+      try {
+        // すべてを反転する
+        if ( key == Keys.M ) {
+          context.GlobalMirror = !context.GlobalMirror;
+        }
+        // イメージのみ反転する
+        else if ( key == Keys.I ) {
+          OpenNI.MirrorCapability mirror = image.MirrorCapability;
+          mirror.SetMirror( !mirror.IsMirrored() );
+        }
+        // デプスのみ反転する
+        else if ( key == Keys.D ) {
+          OpenNI.MirrorCapability mirror = depth.MirrorCapability;
+          mirror.SetMirror( !mirror.IsMirrored() );
+        }
       }
-      // イメージのみ反転する
-      else if (key == Keys.I) {
-        OpenNI.MirrorCapability mirror = image.MirrorCapability;
-        mirror.SetMirror(!mirror.IsMirrored());
-      }
-      // デプスのみ反転する
-      else if (key == Keys.D) {
-        OpenNI.MirrorCapability mirror = depth.MirrorCapability;
-        mirror.SetMirror(!mirror.IsMirrored());
+      catch {
       }
     }
 
