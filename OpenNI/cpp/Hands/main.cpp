@@ -84,7 +84,8 @@ void XN_CALLBACK_TYPE HandDestroy(xn::HandsGenerator& hands,
     handPoint[nId] = hand_point::mapped_type();
 
     // トラッキングの停止
-    hands.StopTracking(nId);
+	// 落ちるのでコメント
+    //hands.StopTracking(nId);
   }
 }
 
