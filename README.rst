@@ -33,10 +33,15 @@ http://d.hatena.ne.jp/kaorun55/20110523/1306140845
 http://d.hatena.ne.jp/kaorun55/20110518/1305722932
 
 
+よくある質問
+------------
+https://github.com/kaorun55/KinectSensorProgramming/wiki/KINECT%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0-FAQ
+
+
 連絡先
 ------
-*kaorun55@gmail.com
-*http://twitter.com/kaorun55
+-kaorun55@gmail.com
+-http://twitter.com/kaorun55
 
 
 不備など
