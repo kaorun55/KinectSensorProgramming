@@ -40,8 +40,8 @@ https://github.com/kaorun55/KinectSensorProgramming/wiki/KINECT%E3%82%BB%E3%83%B
 
 連絡先
 ------
--kaorun55@gmail.com
--http://twitter.com/kaorun55
+- kaorun55@gmail.com
+- http://twitter.com/kaorun55
 
 
 不備など
