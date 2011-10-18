@@ -62,6 +62,10 @@ https://github.com/kaorun55/KinectSensorProgramming/wiki/KINECT%E3%82%BB%E3%83%B
 
 変更履歴
 --------
-2011/07/14：1.3.2.1に対応した
-
-2011/06/10：1.1.0.41に対応した
+========== ============================== ===================================================================
+2011/10/11 1.3.4.3対応版                  https://github.com/kaorun55/KinectSensorProgramming/tree/1.3.4.3
+2011/10/08 1.2.0.7対応版(Xtion Pro LIVE)  https://github.com/kaorun55/KinectSensorProgramming/tree/1.2.0.7
+2011/07/14 1.3.2.1対応版                  https://github.com/kaorun55/KinectSensorProgramming/tree/1.3.2.1
+2011/06/10 1.1.0.41対応版                 https://github.com/kaorun55/KinectSensorProgramming/tree/1.1.0.41
+20///05/28 1.0.0.25対応版(書籍のサンプル) https://github.com/kaorun55/KinectSensorProgramming/branches/master
+========== ============================== ===================================================================
