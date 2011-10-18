@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using OpenNI;
+using NITE;
 
 namespace SteadyDetector
 {
@@ -11,11 +13,11 @@ namespace SteadyDetector
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
+    private Context context;
+    private ImageGenerator image;
 
-    private xnv.SessionManager sessionManager;
-    private xnv.SteadyDetector steadyDetector;
+    private SessionManager sessionManager;
+    private NITE.SteadyDetector steadyDetector;
 
     enum SessionState
     {
@@ -36,31 +38,27 @@ namespace SteadyDetector
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      ScriptNode scriptNode;
+      context = Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // NITEのためのセッションマネージャを作成
-      sessionManager = new xnv.SessionManager(context,
+      sessionManager = new SessionManager(context,
                               "Wave,Click", "RaiseHand");
 
       // セッションの開始と終了を通知するコールバックを登録する
-      sessionManager.SessionStart +=
-            new xnv.SessionManager.SessionStartHandler(sessionManager_SessionStart);
-      sessionManager.SessionEnd +=
-            new xnv.SessionManager.SessionEndHandler(sessionManager_SessionEnd);
-      sessionManager.SessionFocusProgress +=
-            new xnv.SessionManager.SessionFocusProgressHandler(
-                                                sessionManager_SessionFocusProgress);
+      sessionManager.SessionStart += new EventHandler<PositionEventArgs>(sessionManager_SessionStart);
+      sessionManager.SessionEnd += new EventHandler(sessionManager_SessionEnd);
+      sessionManager.SessionFocusProgress += new EventHandler<SessionProgressEventArgs>(sessionManager_SessionFocusProgress);
 
       // Wave(左右運動の検出器)
-      steadyDetector = new xnv.SteadyDetector();
-      steadyDetector.Steady +=
-            new xnv.SteadyDetector.SteadyHandler(steadyDetector_Steady);
+      steadyDetector = new NITE.SteadyDetector();
+      steadyDetector.Steady += new EventHandler<SteadyEventArgs>(steadyDetector_Steady);
 
       // リスナーに追加する
       sessionManager.AddListener(steadyDetector);
@@ -77,7 +75,7 @@ namespace SteadyDetector
       sessionManager.Update(context);
 
       // 画像データを取得する
-      xn.ImageMetaData imageMD = image.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
 
       // カメラ画像の作成
       lock (this) {
@@ -88,7 +86,7 @@ namespace SteadyDetector
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3) {
           dst[0] = src[2];
@@ -113,26 +111,25 @@ namespace SteadyDetector
     }
 
     // 動作の停止を通知する
-    void steadyDetector_Steady(float velocity)
+    void steadyDetector_Steady(object sender, SteadyEventArgs e)
     {
       ++steadCount;
     }
 
     // セッションの開始を通知する
-    void sessionManager_SessionStart(ref xn.Point3D position)
+    void sessionManager_SessionStart(object sender, PositionEventArgs e)
     {
       sessionState = SessionState.InSession;
     }
 
     // セッションの終了を通知する
-    void sessionManager_SessionEnd()
+    void sessionManager_SessionEnd(object sender, EventArgs e)
     {
       sessionState = SessionState.NotInSession;
     }
 
     // セッションフォーカスの検出を通知する
-    void sessionManager_SessionFocusProgress(string strFocus,
-                            ref xn.Point3D ptPosition, float fProgress)
+    void sessionManager_SessionFocusProgress(object sender, SessionProgressEventArgs e)
     {
       sessionState = SessionState.DetectSession;
     }

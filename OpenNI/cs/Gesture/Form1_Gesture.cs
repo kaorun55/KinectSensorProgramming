@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Diagnostics;
+using OpenNI;
 
 namespace Gesture
 {
@@ -13,10 +14,10 @@ namespace Gesture
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
-    private xn.GestureGenerator gesture;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
+    private GestureGenerator gesture;
 
     private string[] gestures;
     private int gestureIndex = 0;
@@ -41,27 +42,28 @@ namespace Gesture
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      ScriptNode scriptNode;
+      context = Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth) as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth) as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスの座標をイメージに合わせる
-      depth.GetAlternativeViewPointCap().SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // ジェスチャージェネレータの作成
-      gesture = context.FindExistingNode(xn.NodeType.Gesture) as xn.GestureGenerator;
+      gesture = context.FindExistingNode(NodeType.Gesture) as GestureGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // ジェスチャーの作成と登録
@@ -77,12 +79,9 @@ namespace Gesture
       }
 
       // ジェスチャー用のコールバックを登録
-      gesture.GestureRecognized += new xn.GestureGenerator.GestureRecognizedHandler(
-                                                        gesture_GestureRecognized);
-      gesture.GestureProgress += new xn.GestureGenerator.GestureProgressHandler(
-                                                        gesture_GestureProgress);
-      gesture.GestureChanged += new xn.StateChangedHandler(
-                                                        gesture_GestureChanged);
+      gesture.GestureRecognized += new EventHandler<GestureRecognizedEventArgs>(gesture_GestureRecognized);
+      gesture.GestureProgress += new EventHandler<GestureProgressEventArgs>(gesture_GestureProgress);
+      gesture.GestureChanged += new EventHandler(gesture_GestureChanged);
 
       // ジェスチャーの検出開始
       context.StartGeneratingAll();
@@ -93,7 +92,7 @@ namespace Gesture
     {
       // カメライメージの更新を待ち、画像データを取得する
       context.WaitOneUpdateAll(image);
-      xn.ImageMetaData imageMD = image.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
 
       // カメラ画像の作成
       lock (this) {
@@ -104,7 +103,7 @@ namespace Gesture
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3) {
           dst[0] = src[2];
@@ -140,22 +139,20 @@ namespace Gesture
     }
 
     // ジェスチャーの検出中
-    void gesture_GestureProgress(xn.ProductionNode node, string strGesture,
-                                      ref xn.Point3D position, float progress)
+    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
     {
       gestureStatus = GestureStatus.Progress;
-      Trace.WriteLine(strGesture + ":" + progress);
+      Trace.WriteLine(e.Gesture + ":" + e.Progress);
     }
 
     // ジェスチャーを検出した
-    void gesture_GestureRecognized(xn.ProductionNode node, string strGesture,
-                          ref xn.Point3D idPosition, ref xn.Point3D endPosition)
+    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
     {
       gestureStatus = GestureStatus.Recognized;
     }
 
     // ジェスチャーが変更された
-    void gesture_GestureChanged(xn.ProductionNode node)
+    void gesture_GestureChanged(object sender, EventArgs e)
     {
       gestureStatus = GestureStatus.Unrecognize;
     }

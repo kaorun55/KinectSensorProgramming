@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace ViewPointCapability
+namespace ViewpointCapability
 {
   static class Program
   {

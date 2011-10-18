@@ -74,14 +74,18 @@ void XN_CALLBACK_TYPE HandDestroy(xn::HandsGenerator& hands,
   XnFloat fTime,
   void* pCookie)
 {
-  std::cout << "HandDestroy:" << nId << std::endl;
-
-  // キューの初期化
+  // 1.1.0.41では、StopTrackingを呼ぶとHandDestroyが呼ばれるので、
+  // 追跡しているときのみ、トラッキングの停止をするようにした
   hand_point& handPoint = *(hand_point*)pCookie;
-  handPoint[nId] = hand_point::mapped_type();
+  if ( handPoint[nId].size() != 0 ) {
+    std::cout << "HandDestroy:" << nId << std::endl;
 
-  // トラッキングの停止
-  hands.StopTracking(nId);
+    // キューの初期化
+    handPoint[nId] = hand_point::mapped_type();
+
+    // トラッキングの停止
+    hands.StopTracking(nId);
+  }
 }
 
 

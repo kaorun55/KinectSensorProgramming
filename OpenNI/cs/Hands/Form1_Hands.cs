@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using OpenNI;
 
 namespace Hands
 {
@@ -12,13 +13,13 @@ namespace Hands
     // 設定ファイルのパス(環境に合わせて変更してください)
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
-    private xn.GestureGenerator gesture;
-    private xn.HandsGenerator hands;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
+    private GestureGenerator gesture;
+    private HandsGenerator hands;
 
-    private Queue<xn.Point3D> handPoints = new Queue<xn.Point3D>();
+    private Queue<Point3D> handPoints = new Queue<Point3D>();
     private const int MAX_POINT = 30;
 
     // ジェスチャーの状態
@@ -52,52 +53,50 @@ namespace Hands
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context(CONFIG_XML_PATH);
+      ScriptNode scriptNode;
+      context = Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
 
       // 鏡モード(反転)にしない
-      context.SetGlobalMirror(false);
+      context.GlobalMirror = false;
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth) as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth) as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスの座標をイメージに合わせる
-      depth.GetAlternativeViewPointCap().SetViewPoint(image);
+      depth.AlternativeViewpointCapability.SetViewpoint(image);
 
       // ジェスチャージェネレータの作成
-      gesture = context.FindExistingNode(xn.NodeType.Gesture) as xn.GestureGenerator;
+      gesture = context.FindExistingNode(NodeType.Gesture) as GestureGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // ジェスチャーの登録
       gesture.AddGesture("RaiseHand");
 
       // ジェスチャー用のコールバックを登録
-      gesture.GestureRecognized += new xn.GestureGenerator.GestureRecognizedHandler(
-                                                        gesture_GestureRecognized);
-      gesture.GestureProgress += new xn.GestureGenerator.GestureProgressHandler(
-                                                        gesture_GestureProgress);
+      gesture.GestureRecognized += new EventHandler<GestureRecognizedEventArgs>(gesture_GestureRecognized);
+      gesture.GestureProgress += new EventHandler<GestureProgressEventArgs>(gesture_GestureProgress);
 
       // ハンドジェネレータの作成
-      hands = context.FindExistingNode(xn.NodeType.Hands) as xn.HandsGenerator;
+      hands = context.FindExistingNode(NodeType.Hands) as HandsGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // ハンドトラッキング用のコールバックを登録する
-      hands.HandCreate += new xn.HandsGenerator.HandCreateHandler(hands_HandCreate);
-      hands.HandUpdate += new xn.HandsGenerator.HandUpdateHandler(hands_HandUpdate);
-      hands.HandDestroy += new xn.HandsGenerator.HandDestroyHandler(
-                                                                hands_HandDestroy);
+      hands.HandCreate += new EventHandler<HandCreateEventArgs>(hands_HandCreate);
+      hands.HandUpdate += new EventHandler<HandUpdateEventArgs>(hands_HandUpdate);
+      hands.HandDestroy += new EventHandler<HandDestroyEventArgs>(hands_HandDestroy);
 
       // ジェスチャーの検出開始
       context.StartGeneratingAll();
@@ -108,7 +107,7 @@ namespace Hands
     {
       // カメライメージの更新を待ち、画像データを取得する
       context.WaitOneUpdateAll(image);
-      xn.ImageMetaData imageMD = image.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
 
       Graphics g;
 
@@ -121,7 +120,7 @@ namespace Hands
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3) {
           dst[0] = src[2];
@@ -133,9 +132,9 @@ namespace Hands
 
         // 手の軌跡を描画
         if (handPoints.Count != 0) {
-          xn.Point3D start = depth.ConvertRealWorldToProjective(handPoints.Peek());
-          foreach (xn.Point3D handPoint in handPoints) {
-            xn.Point3D pt = depth.ConvertRealWorldToProjective(handPoint);
+          Point3D start = depth.ConvertRealWorldToProjective(handPoints.Peek());
+          foreach (Point3D handPoint in handPoints) {
+            Point3D pt = depth.ConvertRealWorldToProjective(handPoint);
             g = Graphics.FromImage(bitmap);
             g.DrawLine(pen, start.X, start.Y, pt.X, pt.Y);
             start = pt;
@@ -163,45 +162,46 @@ namespace Hands
     }
 
     // ジェスチャーの検出中
-    void gesture_GestureProgress(xn.ProductionNode node, string strGesture,
-                                        ref xn.Point3D position, float progress)
+    void gesture_GestureProgress(object sender, GestureProgressEventArgs e)
     {
       gestureStatus = GestureStatus.Progress;
     }
 
     // ジェスチャーを検出した
-    void gesture_GestureRecognized(xn.ProductionNode node, string strGesture,
-                          ref xn.Point3D idPosition, ref xn.Point3D endPosition)
+    void gesture_GestureRecognized(object sender, GestureRecognizedEventArgs e)
     {
       gestureStatus = GestureStatus.Recognized;
 
       // 手のトラッキングを開始する
-      hands.StartTracking(ref endPosition);
+      hands.StartTracking(e.EndPosition);
     }
 
     // 手の検出開始
-    void hands_HandCreate(xn.ProductionNode node, uint id,
-                                ref xn.Point3D position, float fTime)
+    void hands_HandCreate(object sender, HandCreateEventArgs e)
     {
       handStates = HandStatus.Create;
     }
 
     // 手の位置の更新
-    void hands_HandUpdate(xn.ProductionNode node, uint id,
-                                ref xn.Point3D position, float fTime)
+    void hands_HandUpdate(object sender, HandUpdateEventArgs e)
     {
       handStates = HandStatus.Update;
-      handPoints.Enqueue(position);
+      handPoints.Enqueue(e.Position);
     }
 
     // 手の検出終了
-    void hands_HandDestroy(xn.ProductionNode node, uint id, float fTime)
+    void hands_HandDestroy(object sender, HandDestroyEventArgs e)
     {
-      handStates = HandStatus.NoTracking;
-      handPoints.Clear();
+      // 1.1.0.41 ではHandGenerator.StopTrackingでHandDestroyイベントが
+      // 呼び出されるようで再帰になってしまう。
+      // そのためトラッキング停止状態でない場合のみ、トラッキング停止をする
+      if (handStates != HandStatus.NoTracking) {
+        handStates = HandStatus.NoTracking;
+        handPoints.Clear();
 
-      // トラッキングの停止
-      hands.StopTracking(id);
+        // トラッキングの停止
+        hands.StopTracking(e.UserID);
+      }
     }
   }
 }

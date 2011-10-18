@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ViewPointCapability.Properties
+namespace ViewpointCapability.Properties
 {
 
 

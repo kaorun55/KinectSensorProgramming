@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using OpenNI;
 
 namespace Player
 {
@@ -12,10 +13,10 @@ namespace Player
     private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
     private const string RECORD_PATH = @"../../../../../Data/record.oni";
 
-    private xn.Context context;
-    private xn.ImageGenerator image;
-    private xn.DepthGenerator depth;
-    private xn.Player player;
+    private Context context;
+    private ImageGenerator image;
+    private DepthGenerator depth;
+    private OpenNI.Player player;
 
     private bool isShowImage = true;
     private bool isShowDepth = true;
@@ -26,32 +27,33 @@ namespace Player
     private void xnInitialize()
     {
       // コンテキストの初期化
-      context = new xn.Context();
+      context = new Context();
+      // OpenFileRecordingExを使うように促されるが、使用するとアクセスバイオレーションになる
       context.OpenFileRecording(RECORD_PATH);
 
       // プレーヤーの作成
-      player = context.FindExistingNode(xn.NodeType.Player) as xn.Player;
+      player = context.FindExistingNode(NodeType.Player) as OpenNI.Player;
       if (player == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // 終端に達したら通知するコールバックを登録する
-      player.EndOfFileReached += new xn.StateChangedHandler(player_EndOfFileReached);
+      player.EndOfFileReached += new EventHandler(player_EndOfFileReached);
 
       // イメージジェネレータの作成
-      image = context.FindExistingNode(xn.NodeType.Image) as xn.ImageGenerator;
+      image = context.FindExistingNode(NodeType.Image) as ImageGenerator;
       if (image == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
 
       // デプスジェネレータの作成
-      depth = context.FindExistingNode(xn.NodeType.Depth) as xn.DepthGenerator;
+      depth = context.FindExistingNode(NodeType.Depth) as DepthGenerator;
       if (depth == null) {
-        throw new Exception(context.GetGlobalErrorState());
+        throw new Exception(context.GlobalErrorState);
       }
       
       // ヒストグラムバッファの作成
-      histogram = new int[depth.GetDeviceMaxDepth()];
+      histogram = new int[depth.DeviceMaxDepth];
     }
 
     // 描画
@@ -59,8 +61,8 @@ namespace Player
     {
       // ノードの更新を待ち、データを取得する
       context.WaitAndUpdateAll();
-      xn.ImageMetaData imageMD = image.GetMetaData();
-      xn.DepthMetaData depthMD = depth.GetMetaData();
+      ImageMetaData imageMD = image.GetMetaData();
+      DepthMetaData depthMD = depth.GetMetaData();
 
       CalcHist(depthMD);
 
@@ -69,12 +71,12 @@ namespace Player
         // 書き込み用のビットマップデータを作成
         Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
         BitmapData data = bitmap.LockBits(rect, ImageLockMode.WriteOnly,
-                                                PixelFormat.Format24bppRgb);
+                             System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
         // 生データへのポインタを取得
         byte* dst = (byte*)data.Scan0.ToPointer();
-        byte* src = (byte*)image.GetImageMapPtr().ToPointer();
-        ushort* dep = (ushort*)depth.GetDepthMapPtr().ToPointer();
+        byte* src = (byte*)image.ImageMapPtr.ToPointer();
+        ushort* dep = (ushort*)depth.DepthMapPtr.ToPointer();
 
         for (int i = 0; i < imageMD.DataSize; i += 3, src += 3, dst += 3, ++dep) {
           byte pixel = (byte)histogram[*dep];
@@ -110,7 +112,7 @@ namespace Player
     {
       // 反転する
       if (key == Keys.M) {
-        context.SetGlobalMirror(!context.GetGlobalMirror());
+        context.GlobalMirror = !context.GlobalMirror;
       }
       // 画像の表示/非表示
       else if (key == Keys.I) {
@@ -123,12 +125,12 @@ namespace Player
     }
 
     // 記録の終了を通知する
-    void player_EndOfFileReached(xn.ProductionNode node)
+    void player_EndOfFileReached(object sender, EventArgs e)
     {
     }
 
     // ヒストグラムの計算
-    private unsafe void CalcHist(xn.DepthMetaData depthMD)
+    private unsafe void CalcHist(DepthMetaData depthMD)
     {
       for (int i = 0; i < histogram.Length; ++i) {
         histogram[i] = 0;

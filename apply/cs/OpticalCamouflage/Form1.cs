@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
+using OpenNI;
 
 namespace OpticalCamouflage
 {
@@ -25,12 +26,12 @@ namespace OpticalCamouflage
         xnInitialize();
 
         // カメラサイズのイメージを作成(8bitのRGB)
-        xn.MapOutputMode mapMode = image.GetMapOutputMode();
-        bitmap = new Bitmap((int)mapMode.nXRes, (int)mapMode.nYRes,
+        MapOutputMode mapMode = image.MapOutputMode;
+        bitmap = new Bitmap((int)mapMode.XRes, (int)mapMode.YRes,
                     System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
         // ウィンドウサイズをカメラサイズに合わせる
-        ClientSize = new Size((int)mapMode.nXRes, (int)mapMode.nYRes);
+        ClientSize = new Size((int)mapMode.XRes, (int)mapMode.YRes);
 
         // 画像更新のためのスレッドを作成
         shouldRun = true;

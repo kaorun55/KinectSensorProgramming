@@ -32,7 +32,7 @@ void XN_CALLBACK_TYPE SessionEnd(void* UserCxt)
   std::cout << "SessionEnd" << std::endl;
 }
 
-void XN_CALLBACK_TYPE Steady(XnFloat fVelocity, void *pUserCxt)
+void XN_CALLBACK_TYPE Steady(XnUInt32 nId, XnFloat fStdDev, void* pUserCxt)
 {
   std::cout << "Steady" << std::endl;
 }

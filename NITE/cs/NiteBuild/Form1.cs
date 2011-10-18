@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
+using OpenNI;
+using NITE;
 
 namespace NiteBuild
 {
@@ -15,8 +17,9 @@ namespace NiteBuild
       try {
         // 設定ファイルのパス(環境に合わせて変更してください)
         const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
-        xn.Context context = new xn.Context(CONFIG_XML_PATH);
-        xnv.SessionManager sessionManager = new xnv.SessionManager(context,
+        ScriptNode scriptNode;
+        Context context = Context.CreateFromXmlFile( CONFIG_XML_PATH, out scriptNode );
+        SessionManager sessionManager = new SessionManager( context,
                                                 "Wave,Click", "RaiseHand");
         MessageBox.Show("Success");
       }
