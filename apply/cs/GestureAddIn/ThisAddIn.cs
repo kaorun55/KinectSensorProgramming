@@ -2,6 +2,8 @@
 using PowerPoint = Microsoft.Office.Interop.PowerPoint;
 using System.Windows.Forms;
 using System.Threading;
+using OpenNI;
+using NITE;
 
 namespace GestureAddIn
 {
@@ -14,10 +16,10 @@ namespace GestureAddIn
         private const string CONFIG_XML_PATH = @"../../../../../Data/SamplesConfig.xml";
 
         // OpenNIクラス群
-        xn.Context context = null;
-        xnv.SessionManager sessionManager = null;
-        xnv.WaveDetector waveDetector = null;
-        xnv.PushDetector pushDetector = null;
+        Context context = null;
+        SessionManager sessionManager = null;
+        WaveDetector waveDetector = null;
+        PushDetector pushDetector = null;
 
         Thread UpdateThread = null;
 
@@ -29,14 +31,14 @@ namespace GestureAddIn
                 this.Application.SlideShowEnd += new Microsoft.Office.Interop.PowerPoint.EApplication_SlideShowEndEventHandler(Application_SlideShowEnd);
 
                 // OpenNIの初期設定
-                context = new xn.Context(CONFIG_XML_PATH);
-                sessionManager = new xnv.SessionManager(context, "Click", "RaiseHand");
+                context = new Context(CONFIG_XML_PATH);
+                sessionManager = new SessionManager(context, "Click", "RaiseHand");
 
-                waveDetector = new xnv.WaveDetector();
-                pushDetector = new xnv.PushDetector();
+                waveDetector = new WaveDetector();
+                pushDetector = new PushDetector();
 
-                waveDetector.Wave += new xnv.WaveDetector.WaveHandler(waveDetector_Wave);
-                pushDetector.Push += new xnv.PushDetector.PushHandler(pushDetector_Push);
+                waveDetector.Wave += new EventHandler(waveDetector_Wave);
+                pushDetector.Push += new EventHandler<VelocityAngleEventArgs>(pushDetector_Push);
 
                 sessionManager.AddListener(waveDetector);
                 sessionManager.AddListener(pushDetector);
@@ -54,6 +56,24 @@ namespace GestureAddIn
             }
             catch (Exception ex) {
                 MessageBox.Show("アドインの初期化に失敗しました\n" + ex.Message);
+            }
+        }
+
+        void pushDetector_Push(object sender, VelocityAngleEventArgs e)
+        {
+            // スライドショーが開始されていれば、次のスライドに進む
+            if (SlideShow != null)
+            {
+                SlideShow.View.Next();
+            }
+        }
+
+        void waveDetector_Wave(object sender, EventArgs e)
+        {
+            // スライドショーが開始されていれば、前のスライドに戻る
+            if (SlideShow != null)
+            {
+                SlideShow.View.Previous();
             }
         }
 
@@ -94,24 +114,6 @@ namespace GestureAddIn
         void Application_SlideShowEnd(Microsoft.Office.Interop.PowerPoint.Presentation Pres)
         {
             SlideShow = null;
-        }
-
-        // 前後運動を検出
-        void pushDetector_Push(float velocity, float angle)
-        {
-            // スライドショーが開始されていれば、次のスライドに進む
-            if (SlideShow != null) {
-                SlideShow.View.Next();
-            }
-        }
-
-        // 左右運動を検出
-        void waveDetector_Wave()
-        {
-            // スライドショーが開始されていれば、前のスライドに戻る
-            if (SlideShow != null) {
-                SlideShow.View.Previous();
-            }
         }
     }
 }

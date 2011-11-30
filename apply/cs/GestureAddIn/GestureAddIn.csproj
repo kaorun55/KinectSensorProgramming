@@ -142,8 +142,9 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="XnVNITE.net">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files\Prime Sense\NITE\Bin\XnVNITE.net.dll</HintPath>
+    <Reference Include="XnVNITE.net, Version=1.5.0.2, Culture=neutral, PublicKeyToken=399870656fc6c787, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\PrimeSense\NITE\Bin\XnVNITE.net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
